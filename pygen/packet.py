@@ -1,30 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from .element import PyGenElement
-from .struct import PyGenData
+from .struct import PyGenStruct
 from . import debug
 
 
-class PyGenPacket(PyGenElement):
+class PyGenPacket(PyGenStruct):
+    """
+    A Packet is a sub-set of a struct.
+    """
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, "PACKET", **kwargs)
+        PyGenStruct.__init__(self, **kwargs)
 
-        self.entries = []
+        self.parse_packet()
 
-        self.parse()
-
-    def parse(self):
+    def parse_packet(self):
         """
         Parse a packet object
         """
 
-        debug.debug("Parsing packet:", self.path)
-        
-        for entry in self.data:
-            self.entries.append(PyGenData(
-                name=entry,
-                data=self.data[entry],
-                path=self.path
-            ))
+        debug.debug("Parsing packet:", self.name)
+
+        # Note - the underlying struct data has already been parsed here

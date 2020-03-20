@@ -23,7 +23,7 @@ class PyGenParser(PyGenElement):
         if "path" not in kwargs:
             kwargs["path"] = dirpath
 
-        PyGenElement.__init__(self, "DIRECTORY", **kwargs)
+        PyGenElement.__init__(self, **kwargs)
 
         self._files = []
         self._dirs = []
@@ -78,7 +78,7 @@ class PyGenFile(PyGenElement):
         if "path" not in kwargs:
             kwargs["path"] = filepath
 
-        PyGenElement.__init__(self, "FILE", **kwargs)
+        PyGenElement.__init__(self, **kwargs)
 
         self.enums = []
         self.packets = []

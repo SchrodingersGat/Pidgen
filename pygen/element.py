@@ -12,7 +12,7 @@ class PyGenElement():
     
     """
 
-    def __init__(self, element_type, **kwargs):
+    def __init__(self, **kwargs):
         """
         Initialize the element with some basic information
 
@@ -32,9 +32,6 @@ class PyGenElement():
 
         # Store settings dict (default = empty dict)
         self.settings = kwargs.get("settings", {})
-
-        # Default element name (sub-classes should override)
-        self.element_type = element_type
 
     @property
     def verbosity(self):
@@ -62,15 +59,3 @@ class PyGenElement():
     def namespace(self):
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
-
-    def __str__(self):
-        """ String representation of this item. """
-
-        lvl = "-" * (self.level - 1) if self.level > 1 else ""
-
-        return "{lvl} {el} - {name} - {path}".format(
-            lvl=lvl,
-            el=self.element_type,
-            name=self.name,
-            path=self.path,
-        )

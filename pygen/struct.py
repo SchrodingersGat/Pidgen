@@ -1,98 +1,65 @@
 # -*- coding: utf-8 -*-
 
 from .element import PyGenElement
+from .data import PyGenData
 from . import debug
 
 
-class PyGenData(PyGenElement):
+class PyGenStruct(PyGenElement):
     """
-    A PyGenData object is a basic data entry,
-    which can be defined in either a struct or a packet
+    A PyGenStruct object is equivalent to a 'struct' in C-like languages.
+    It contains sequential data elements (which can be other structs).
+    Structs can be arbitrarily nested
 
     Attributes:
-        datatype - Native datatype of this entry
-        encoding - "On the wire" encoding of this entry (optional)
+        data - Array of data contained within this struct
     """
 
-    KEY_DATATYPE = "datatype"
-    KEY_ENCODING = "encoding"
-
-    # Allowable datatypes
-    DATA_U8 = 'U8'          # Unsigned integer, 8 bits
-    DATA_S8 = "S8"          # Signed integer, 8 bits
-    DATA_U16 = "U16"        # Unsigned integer, 16 bits
-    DATA_S16 = "S16"        # Signed integer, 16 bits
-    DATA_U32 = "U32"        # Unsigned integer, 32 bits
-    DATA_S32 = "S32"        # Signed integer, 32 bits
-    DATA_U64 = "U64"        # Unsigned integer, 64 bits
-    DATA_S64 = "S64"        # Signed integer, 64 bits
-    DATA_F16 = "F16"        # Floating point, 16 bits
-    DATA_F32 = "F32"        # Floating point, 32 bits
-    DATA_F64 = "F64"        # Floating point, 64 bits
-    DATA_STR = "STRING"     # String (char*)
-
-    _U_FMT_STRING = ["u{n}", "uint{n}", "uint{n}_t", "unsigned{n}"]
-    _S_FMT_STRING = ["i{n}", "s{n}", "int{n}", "sint{n}", "int{n}_t", "sint{n}_t", "signed{n}"]
-    _F_FMT_STRING = ["f{n}", "float{n}"]
-
-    # String lookup maps for allowed datatypes
-    _DATATYPE_KEYS = {
-        DATA_U8: [x.format(n=8) for x in _U_FMT_STRING] + ["char", "unsigned char", "unsigned byte"],
-        DATA_S8: [x.format(n=8) for x in _S_FMT_STRING] + ["signed char", "signed byte"],
-        DATA_U16: [x.format(n=16) for x in _U_FMT_STRING],
-        DATA_S16: [x.format(n=16) for x in _S_FMT_STRING],
-        DATA_U32: [x.format(n=32) for x in _U_FMT_STRING],
-        DATA_S32: [x.format(n=32) for x in _S_FMT_STRING],
-        DATA_U64: [x.format(n=64) for x in _U_FMT_STRING],
-        DATA_S64: [x.format(n=64) for x in _S_FMT_STRING],
-        DATA_F16: [x.format(n=16) for x in _F_FMT_STRING],
-        DATA_F32: [x.format(n=32) for x in _F_FMT_STRING],
-        DATA_F64: [x.format(n=64) for x in _F_FMT_STRING],
-        DATA_STR: ["str", "string", "text"],
-    }
+    KEY_STRUCT = "struct"
+    KEY_DATA = "data"
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, "DATA_ENTRY", **kwargs)
+        PyGenElement.__init__(self, **kwargs)
 
+        # List of variables which exist in this struct
+        self.variables = []
+        
         self.parse()
 
     def parse(self):
-        debug.debug("Parsing data entry:", self.name)
+        debug.debug("Parsing struct:", self.name)
 
-    @property
-    def datatype(self):
+        self.parse_data()
+
+    def parse_data(self):
         """
-        Return the 'datatype' for this packet element.
-
-        If no 'datatype' is specified, look for an 'encoding' specification.
+        Parse the variables provided under the 'data' tag.
         """
 
-        dt = ""
+        if self.KEY_DATA not in self.data:
+            debug.warning("Empty struct '{s}'".format(s=self.name), self.path)
+            return
 
-        if self.KEY_DATATYPE in self.data:
-            dt = self.data[self.KEY_DATATYPE]
-        elif self.KEY_ENCODING in self.data:
-            dt = self.data[self.KEY_ENCODING]
-        else:
-            self.error("No '{key}' set for entry '{name}'".format(
-                key=self.KEY_DATATYPE,
-                name=self.name
-            ))
+        variables = self.data[self.KEY_DATA]
 
-            return None
+        for var in variables:
 
-        # Ensure lower-case for comparison
-        dt = dt.lower()
+            var_data = variables[var]
 
-        for key in self._DATATYPE_KEYS:
+            # Is the variable a 'struct'?
+            if self.KEY_STRUCT in var:
+                self.variables.append(PyGenStruct(
+                    name=var,
+                    data=var_data,
+                    path=self.path,
+                    settings=self.settings
+                ))
 
-            options = self._DATATYPE_KEYS[key]
-        
-            if dt in options:
-                return key
-
-        # No valid datatype determined...
-        self.error("Datatype '{dt}' not valid".format(dt=dt))
-        
-        return None
+            else:
+                self.variables.append(PyGenData(
+                    name=var,
+                    data=var_data,
+                    path=self.path,
+                    settings=self.settings
+                ))
