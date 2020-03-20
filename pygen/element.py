@@ -30,6 +30,9 @@ class PyGenElement():
         # Default element name (sub-classes should override)
         self.element_type = element_type
 
+        self.warnings = []
+        self.errors = []
+
     @property
     def level(self):
         """
@@ -54,14 +57,20 @@ class PyGenElement():
         Print a warning message
         """
 
-        print("{path}: WARNING - {msg}".format(path=self.path, msg=msg))
+        warning = "{path}: WARNING - {msg}".format(path=self.path, msg=msg)
+
+        print(warning)
+        self.warnings.append(warning)
 
     def error(self, msg):
         """
         Print an error message
         """
 
-        print("{path}: ERROR - {msg}".format(path=self.path, msg=msg))
+        error = "{path}: ERROR - {msg}".format(path=self.path, msg=msg)
+
+        print(error)
+        self.errors.append(error)
 
     def __str__(self):
         """ String representation of this item. """
