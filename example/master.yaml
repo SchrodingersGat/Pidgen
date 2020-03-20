@@ -7,7 +7,7 @@ enumerations:
       dog:
         value: 5
         comment: This is a dog
-      parrot:
+      parrot: 2
       goanna:
       dragon: "22"
       horse:

@@ -3,6 +3,7 @@
 from .element import PyGenElement
 from . import debug
 
+
 class PyGenEnumeration(PyGenElement):
     """
     The PyGenEnumeration class provides support for integer enumerations.
@@ -32,18 +33,19 @@ class PyGenEnumeration(PyGenElement):
 
     def parse(self):
         
-        debug.message("Parsing enumeration -", self.name)
+        debug.debug("Parsing enumeration -", self.name)
 
         values = self.data.get(self.KEY_VALUES, [])
 
         # Seed the iterator index
         idx = 0
 
+        # Keep track of which values have been observed
+        values_seen = set()
+
         for item in values:
 
             data = values[item]
-
-            #print(item, data, type(data))
 
             """
             The simplest way to specify an enumeration value is simply with a "key" line:
@@ -55,6 +57,27 @@ class PyGenEnumeration(PyGenElement):
             In such a case, extra options are not avaialable.
             
             Finally, the provided data may be a dict{} containing extra information about the enum
+
+            So, a set of enumeration values could look like:
+
+            values:
+                cat: 1
+                dog:
+                mouse:
+                    comment: The value of this item will be 3
+                camel:
+                    value: 100
+                    comment: Reset the value of this item
+                octopus: 8
+
+            Which will evaluate to:
+
+            cat -> 1
+            dog -> 2
+            mouse -> 3
+            octopus -> 8
+            camel -> 100
+
             """
 
             if data is None:
@@ -112,10 +135,21 @@ class PyGenEnumeration(PyGenElement):
 
             data = values[item]
 
+            # Check that the computed value has not been seen previously
+            if value in values_seen:
+                debug.error("Enum {e}:{i} - Value '{v}' already exists - {f}".format(
+                    e=self.name,
+                    i=item,
+                    v=value,
+                    f=self.path
+                ))
+            else:
+                values_seen.add(value)
+
+            # Increment the index for the next loop
             idx = idx + 1
 
     @property
     def prefix(self):
         """ Return the prefix for this enumeration """
         return self.data.get(self.KEY_PREFIX, "")
-        
