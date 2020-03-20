@@ -137,7 +137,7 @@ class PyGenEnumeration(PyGenElement):
 
             # Check that the computed value has not been seen previously
             if value in values_seen:
-                debug.error("Enum {e}:{i} - Value '{v}' already exists - {f}".format(
+                debug.warning("Enum {e}:{i} - Value '{v}' is duplicated - {f}".format(
                     e=self.name,
                     i=item,
                     v=value,
@@ -149,7 +149,19 @@ class PyGenEnumeration(PyGenElement):
             # Increment the index for the next loop
             idx = idx + 1
 
+            debug.debug("Found enumeration value:", self.renderKey(item), "->", value)
+
     @property
     def prefix(self):
         """ Return the prefix for this enumeration """
-        return self.data.get(self.KEY_PREFIX, "")
+        return self.data.get(self.KEY_PREFIX, "").strip()
+
+    def renderKey(self, key, capitalize=True):
+        """ Render a key for this enumeration """
+
+        key = key.strip()
+
+        if capitalize:
+            key = key.upper()
+
+        return self.prefix + key
