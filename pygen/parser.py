@@ -54,6 +54,14 @@ class PyGenParser(PyGenElement):
             if os.path.isfile(path) and item.endswith(".yaml"):
                 files.append(item)
 
+        # Parse any files first
+        self.parseFiles(files)
+
+        # Then parse any sub-directories
+        self.parseSubDirs(dirs)
+
+    def parseFiles(self, files):
+
         if len(files) == 0:
             debug.info("No protocol files found in directory '{d}'".format(d=self.path))
 
@@ -66,7 +74,7 @@ class PyGenParser(PyGenElement):
 
             self._files.append(PyGenFile(os.path.join(self.path, f), settings=self.settings))
 
-        # Parse all subdirectories
+    def parseSubDirs(self, dirs):
         for d in dirs:
 
             self._dirs.append(PyGenParser(os.path.join(self.path, d), settings=self.settings))
