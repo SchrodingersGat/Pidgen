@@ -1,1 +1,2 @@
-colorama==0.4.3     # Pretty text printing
+colorama==0.4.3             # Pretty text printing
+flake8==3.3.0               # PEP checking

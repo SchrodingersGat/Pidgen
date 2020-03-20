@@ -8,6 +8,7 @@ import os
 import yaml
 
 from .element import PyGenElement
+from .struct import PyGenStruct
 from .packet import PyGenPacket
 from .enumeration import PyGenEnumeration
 from . import debug
@@ -73,10 +74,12 @@ class PyGenParser(PyGenElement):
 
 class PyGenFile(PyGenElement):
 
+    KEY_STRUCTS = "structs"
     KEY_PACKETS = "packets"
     KEY_ENUMS = "enumerations"
 
     _VALID_KEYS = [
+        KEY_STRUCTS,
         KEY_PACKETS,
         KEY_ENUMS
     ]
@@ -90,6 +93,7 @@ class PyGenFile(PyGenElement):
 
         self.enums = []
         self.packets = []
+        self.structs = []
 
         self.parse()
 
@@ -103,8 +107,22 @@ class PyGenFile(PyGenElement):
         with open(self.path, 'r') as yaml_file:
             self.data = yaml.safe_load(yaml_file)
 
+        self.parseStructs()
         self.parsePackets()
         self.parseEnums()
+
+    def parseStructs(self):
+
+        structs = self.data.get(self.KEY_STRUCTS, {})
+
+        for struct in structs:
+            
+            self.structs.append(PyGenStruct(
+                name=struct,
+                data=structs[struct],
+                path=self.path,
+                settings=self.settings
+            ))
 
     def parsePackets(self):
         
