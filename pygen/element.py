@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import os
+from . import debug
 
 
 class PyGenElement():
@@ -11,6 +12,12 @@ class PyGenElement():
     Provides low-level functionality inherited by all higher classes
     
     """
+
+    # Default implementation of _VALID_KEYS is empty
+    _VALID_KEYS = []
+
+    # Default implementation of _REQUIRED_KEYS is empty
+    _REQUIRED_KEYS = []
 
     def __init__(self, **kwargs):
         """
@@ -32,6 +39,33 @@ class PyGenElement():
 
         # Store settings dict (default = empty dict)
         self.settings = kwargs.get("settings", {})
+
+        self.validateKeys()
+
+    def validateKeys(self):
+        """
+        Ensure that the tags provided under this element are valid.
+        """
+
+        # Check that any required keys are provided
+        provided = [key.lower() for key in self.data]
+        for key in self._REQUIRED_KEYS:
+            if key not in provided:
+                debug.warning("Required key '{k}' missing from '{name}' in {f}".format(
+                    k=key,
+                    name=self.name,
+                    f=self.path
+                ))
+
+        # Check for unknown keys
+        for el in self.data:
+            if el.lower() not in self._VALID_KEYS:
+                debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
+                    k=el,
+                    name=self.name,
+                    f=self.path
+                ))
+                # TODO - Use Levenstein distance for a "did-you-mean" message
 
     @property
     def verbosity(self):

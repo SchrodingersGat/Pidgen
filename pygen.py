@@ -50,7 +50,12 @@ def main():
     # Parse the protocol
     PyGenParser(protocol_dir, settings={})
 
-    sys.exit(debug.getErrorCount())
+    errors = debug.getErrorCount()
+
+    if errors > 0:
+        debug.error("Exiting with {n} errors".format(n=errors))
+
+    sys.exit(errors)
 
 
 if __name__ == '__main__':

@@ -15,9 +15,17 @@ class PyGenData(PyGenElement):
         units - Natural units of the represented data
     """
 
+    KEY_STRUCT = "struct"
     KEY_DATATYPE = "datatype"
     KEY_ENCODING = "encoding"
     KEY_UNITS = "units"
+
+    _VALID_KEYS = [
+        KEY_STRUCT,
+        KEY_DATATYPE,
+        KEY_ENCODING,
+        KEY_UNITS
+    ]
 
     # Allowable datatypes
     DATA_U8 = 'U8'          # Unsigned integer, 8 bits

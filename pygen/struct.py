@@ -15,8 +15,11 @@ class PyGenStruct(PyGenElement):
         data - Array of data contained within this struct
     """
 
-    KEY_STRUCT = "struct"
     KEY_DATA = "data"
+
+    _VALID_KEYS = [
+        KEY_DATA,
+    ]
 
     def __init__(self, **kwargs):
 
@@ -48,7 +51,7 @@ class PyGenStruct(PyGenElement):
             var_data = variables[var]
 
             # Is the variable a 'struct'?
-            if self.KEY_STRUCT in var:
+            if PyGenData.KEY_STRUCT in var:
                 self.variables.append(PyGenStruct(
                     name=var,
                     data=var_data,

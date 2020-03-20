@@ -73,6 +73,14 @@ class PyGenParser(PyGenElement):
 
 class PyGenFile(PyGenElement):
 
+    KEY_PACKETS = "packets"
+    KEY_ENUMS = "enumerations"
+
+    _VALID_KEYS = [
+        KEY_PACKETS,
+        KEY_ENUMS
+    ]
+
     def __init__(self, filepath, **kwargs):
 
         if "path" not in kwargs:
@@ -100,7 +108,7 @@ class PyGenFile(PyGenElement):
 
     def parsePackets(self):
         
-        packets = self.data.get("packets", {})
+        packets = self.data.get(self.KEY_PACKETS, {})
 
         for packet in packets:
 
@@ -113,7 +121,7 @@ class PyGenFile(PyGenElement):
 
     def parseEnums(self):
 
-        enums = self.data.get("enumerations", {})
+        enums = self.data.get(self.KEY_ENUMS, {})
 
         for enum in enums:
 
