@@ -70,7 +70,7 @@ class PyGenElement():
         provided = [key.lower() for key in self.data]
         for key in self.required_keys:
             if key not in provided:
-                debug.warning("Required key '{k}' missing from '{name}' in {f}".format(
+                debug.error("Required key '{k}' missing from '{name}' in {f}".format(
                     k=key,
                     name=self.name,
                     f=self.path

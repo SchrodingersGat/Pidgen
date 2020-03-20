@@ -1,3 +1,30 @@
+enumerations:
+
+  animals:
+    prefix: ANIMAL_
+    values:
+      cat: 3
+      dog:
+        value: 5
+        comment: This is a dog
+      parrot:
+      goanna:
+      dragon: "22"
+      horse:
+      monkey:
+        value: 10
+        comment: Reset the enumeration value
+
+  cars:
+    prefix: CAR_
+    values:
+      toyota: 234x
+      mazda:
+      hyundai:
+
+  trees:
+    prefix: TREE_
+
 packets:
 
   # Datestamp
@@ -9,7 +36,7 @@ packets:
         datatype: u8
         encoding: b5
       day:
-        datatype: u81
+        datatype: u64
         encoding: u6
 
   # Person
