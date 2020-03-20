@@ -93,7 +93,7 @@ def warning(*arg):
     _msg(Fore.YELLOW, MSG_CODES[MSG_WARN], *arg)
 
 
-def error(*arg, fail=False):
+def error(*arg, fail=False):  # noqa: E999
     """
     Display an error message
     """

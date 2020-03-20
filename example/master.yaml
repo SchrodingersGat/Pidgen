@@ -17,7 +17,6 @@ packets:
     data:
       name:
         datatype: string
-        length: 32
       age:
         datatype: u8
       height:

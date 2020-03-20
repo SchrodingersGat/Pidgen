@@ -13,6 +13,15 @@ class PyGenElement():
     
     """
 
+    # Generic keys we can expect for most element types
+    KEY_NAME = "name"
+    KEY_COMMENT = "comment"
+
+    _BASIC_KEYS = [
+        KEY_NAME,
+        KEY_COMMENT
+    ]
+
     # Default implementation of _VALID_KEYS is empty
     _VALID_KEYS = []
 
@@ -59,7 +68,8 @@ class PyGenElement():
 
         # Check for unknown keys
         for el in self.data:
-            if el.lower() not in self._VALID_KEYS:
+            allowed = self._BASIC_KEYS + self._VALID_KEYS
+            if el.lower() not in allowed:
                 debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
                     k=el,
                     name=self.name,
