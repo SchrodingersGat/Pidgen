@@ -59,7 +59,7 @@ class PyGenElement():
     @property
     def allowed_keys(self):
         """ Return a list of keys allowed for this element """
-        return self._BASIC_KEYS + self._VALID_KEYS 
+        return self._BASIC_KEYS + self._VALID_KEYS
 
     def validateKeys(self):
         """
