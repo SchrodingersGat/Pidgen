@@ -1,0 +1,23 @@
+packets:
+
+  # Datestamp
+  datestamp:
+    year:
+      datatype: u16
+    month:
+      datatype: u8
+      encoding: b5
+    day:
+      datatype: u8
+      encoding: u6
+
+  # Person
+  person:
+    name:
+      datatype: string
+      length: 32
+    age:
+      datatype: u8
+    height:
+      datatype: u16
+      units: mm
