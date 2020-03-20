@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 
 from .element import PyGenElement
-
+from .struct import PyGenData
 
 class PyGenPacket(PyGenElement):
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, **kwargs)
+        PyGenElement.__init__(self, "PACKET", **kwargs)
 
-        print("Parsing packet:", self.name)
+        print(self)
 
-        self.elements = []
+        self.entries = []
 
         self.parse()
 
     def parse(self):
         
-        for element in self.data:
-            print(" - ", element)
+        for entry in self.data:
+            self.entries.append(PyGenData(
+                name=entry,
+                data=self.data[entry],
+                path=self.path
+            ))

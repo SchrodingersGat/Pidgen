@@ -21,7 +21,9 @@ class PyGenParser(PyGenElement):
 
         kwargs["path"] = path
 
-        PyGenElement.__init__(self, **kwargs)
+        PyGenElement.__init__(self, "DIRECTORY", **kwargs)
+
+        print(self)
 
         self.yaml_files = []
         self.sub_dirs = []
@@ -71,7 +73,9 @@ class PyGenFile(PyGenElement):
 
         kwargs["path"] = path
 
-        PyGenElement.__init__(self, **kwargs)
+        PyGenElement.__init__(self, "FILE", **kwargs)
+
+        print(self)
 
         self.enums = []
         self.packets = []
