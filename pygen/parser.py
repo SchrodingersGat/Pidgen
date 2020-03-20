@@ -7,21 +7,26 @@ Directory and file parser code
 import os
 import yaml
 
+from .element import PyGenElement
+from .packet import PyGenPacket
+from .enumeration import PyGenEnumeration
 
-class PyGenParser():
+
+class PyGenParser(PyGenElement):
     """
     Class for parsing a directory of protocol definition files.
     """
 
     def __init__(self, path, **kwargs):
 
-        self.path = path
+        kwargs["path"] = path
+
+        PyGenElement.__init__(self, **kwargs)
 
         self.yaml_files = []
         self.sub_dirs = []
 
-        # Optional arguments
-        self.prefix = kwargs.get("prefix", "")
+        self.parse()
 
     def parse(self):
         """ Parse the current directory.
@@ -50,7 +55,7 @@ class PyGenParser():
                 # TODO
                 continue
 
-            p = PyGenFileParser(os.path.join(self.path, f))
+            p = PyGenFile(os.path.join(self.path, f))
             p.parse()
 
         # Parse all subdirectories
@@ -60,17 +65,42 @@ class PyGenParser():
             p.parse()
 
 
-class PyGenFileParser():
+class PyGenFile(PyGenElement):
 
     def __init__(self, path, **kwargs):
 
-        self.path = path
-        self.data = {}
+        kwargs["path"] = path
+
+        PyGenElement.__init__(self, **kwargs)
+
+        self.enums = []
+        self.packets = []
 
     def parse(self):
-        print("Parsing -", self.path)
+        print("Parsing file: ", self.path, self.namespace)
 
         with open(self.path, 'r') as yaml_file:
             self.data = yaml.safe_load(yaml_file)
 
-        print(self.data)
+        self.parsePackets()
+        self.parseEnums()
+
+    def parsePackets(self):
+        
+        packets = self.data.get("packets", {})
+
+        for packet in packets:
+
+            self.packets.append(PyGenPacket(
+                name=packet,
+                data=packets[packet],
+                path=self.path
+            ))
+
+    def parseEnums(self):
+
+        enums = self.data.get("enumerations", {})
+
+        for enum in enums:
+
+            self.enums.append(PyGenEnumeration(enum))
