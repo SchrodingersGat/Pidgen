@@ -12,11 +12,17 @@ import argparse
 from version import PYGEN_VERSION
 
 
-parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool")
+def main():
 
-parser.add_argument("protocol", help="Path to top-level protocol directory")
+    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool")
 
-parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PYGEN_VERSION))
+    parser.add_argument("protocol", help="Path to top-level protocol directory")
 
-args = parser.parse_args()
+    parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PYGEN_VERSION))
 
+    args = parser.parse_args()
+
+
+
+if __name__ == '__main__':
+    main()
