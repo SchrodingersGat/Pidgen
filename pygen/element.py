@@ -44,7 +44,6 @@ class PyGenElement():
         """
         return self.settings.get('verbosity', self._MSG_WARN)
 
-
     @property
     def level(self):
         """

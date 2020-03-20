@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .element import PyGenElement
+from . import debug
 
 
 class PyGenData(PyGenElement):
@@ -17,18 +18,18 @@ class PyGenData(PyGenElement):
     KEY_ENCODING = "encoding"
 
     # Allowable datatypes
-    DATA_U8 = 'U8'      # Unsigned integer, 8 bits
-    DATA_S8 = "S8"      # Signed integer, 8 bits
-    DATA_U16 = "U16"    # Unsigned integer, 16 bits
-    DATA_S16 = "S16"    # Signed integer, 16 bits
-    DATA_U32 = "U32"    # Unsigned integer, 32 bits
-    DATA_S32 = "S32"    # Signed integer, 32 bits
-    DATA_U64 = "U64"    # Unsigned integer, 64 bits
-    DATA_S64 = "S64"    # Signed integer, 64 bits
-    DATA_F16 = "F16"    # Floating point, 16 bits
-    DATA_F32 = "F32"    # Floating point, 32 bits
-    DATA_F64 = "F64"    # Floating point, 64 bits
-    DATA_STR = "STRING" # String (char*)
+    DATA_U8 = 'U8'          # Unsigned integer, 8 bits
+    DATA_S8 = "S8"          # Signed integer, 8 bits
+    DATA_U16 = "U16"        # Unsigned integer, 16 bits
+    DATA_S16 = "S16"        # Signed integer, 16 bits
+    DATA_U32 = "U32"        # Unsigned integer, 32 bits
+    DATA_S32 = "S32"        # Signed integer, 32 bits
+    DATA_U64 = "U64"        # Unsigned integer, 64 bits
+    DATA_S64 = "S64"        # Signed integer, 64 bits
+    DATA_F16 = "F16"        # Floating point, 16 bits
+    DATA_F32 = "F32"        # Floating point, 32 bits
+    DATA_F64 = "F64"        # Floating point, 64 bits
+    DATA_STR = "STRING"     # String (char*)
 
     _U_FMT_STRING = ["u{n}", "uint{n}", "uint{n}_t", "unsigned{n}"]
     _S_FMT_STRING = ["i{n}", "s{n}", "int{n}", "sint{n}", "int{n}_t", "sint{n}_t", "signed{n}"]
@@ -57,7 +58,7 @@ class PyGenData(PyGenElement):
         self.parse()
 
     def parse(self):
-        pass
+        debug.debug("Parsing data entry:", self.name)
 
     @property
     def datatype(self):

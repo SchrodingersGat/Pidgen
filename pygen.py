@@ -47,7 +47,10 @@ def main():
 
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
-    protocol = PyGenParser(protocol_dir, settings={})
+    # Parse the protocol
+    PyGenParser(protocol_dir, settings={})
+
+    sys.exit(debug.getErrorCount())
 
 
 if __name__ == '__main__':

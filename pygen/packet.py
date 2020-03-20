@@ -2,6 +2,8 @@
 
 from .element import PyGenElement
 from .struct import PyGenData
+from . import debug
+
 
 class PyGenPacket(PyGenElement):
 
@@ -14,6 +16,11 @@ class PyGenPacket(PyGenElement):
         self.parse()
 
     def parse(self):
+        """
+        Parse a packet object
+        """
+
+        debug.debug("Parsing packet:", self.path)
         
         for entry in self.data:
             self.entries.append(PyGenData(

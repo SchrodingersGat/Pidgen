@@ -31,7 +31,12 @@ def setDebugLevel(level):
     MSG_LEVEL = int(level)
 
 
-def _msg(color, prefix, *arg, filename=""):
+def getErrorCount():
+    global ERR_COUNT
+    return ERR_COUNT
+
+
+def _msg(color, prefix, *arg):
     """
     Display a message with the given color.
     """
@@ -41,21 +46,18 @@ def _msg(color, prefix, *arg, filename=""):
     if prefix:
         msg += prefix
 
-    if filename:
-        msg += " - " + filename + ":"
-
     print(msg, *arg)
 
 
-def message(*arg, filename=""):
+def message(*arg):
     """
     Display a message
     """
 
-    _msg(Fore.WHITE, "", *arg, filename=filename)
+    _msg(Fore.WHITE, "", *arg)
 
 
-def debug(*arg, filename=""):
+def debug(*arg):
     """
     Display a debug message.
     """
@@ -64,10 +66,10 @@ def debug(*arg, filename=""):
     if MSG_LEVEL < MSG_DEBUG:
         return
 
-    _msg(Fore.BLUE, MSG_CODES[MSG_DEBUG], *arg, filename=filename)
+    _msg(Fore.LIGHTCYAN_EX, MSG_CODES[MSG_DEBUG], *arg)
 
 
-def info(*arg, filename=""):
+def info(*arg):
     """
     Display an info message.
     """
@@ -76,10 +78,10 @@ def info(*arg, filename=""):
     if MSG_LEVEL < MSG_INFO:
         return
 
-    _msg(Fore.WHITE, MSG_CODES[MSG_INFO], *arg, filename=filename)
+    _msg(Fore.WHITE, MSG_CODES[MSG_INFO], *arg)
 
 
-def warning(*arg, filename=""):
+def warning(*arg):
     """
     Display a warning message
     """
@@ -88,10 +90,10 @@ def warning(*arg, filename=""):
     if MSG_LEVEL < MSG_WARN:
         return
 
-    _msg(Fore.YELLOW, MSG_CODES[MSG_WARN], *arg, filename=filename)
+    _msg(Fore.YELLOW, MSG_CODES[MSG_WARN], *arg)
 
 
-def error(*arg, filename="", fail=False):
+def error(*arg, fail=False):
     """
     Display an error message
     """
@@ -102,7 +104,7 @@ def error(*arg, filename="", fail=False):
     if MSG_LEVEL < MSG_ERROR:
         return
 
-    _msg(Fore.RED, MSG_CODES[MSG_ERROR], *arg, filename=filename)
+    _msg(Fore.RED, MSG_CODES[MSG_ERROR], *arg)
 
     ERR_COUNT += 1
 

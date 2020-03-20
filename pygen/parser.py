@@ -25,8 +25,8 @@ class PyGenParser(PyGenElement):
 
         PyGenElement.__init__(self, "DIRECTORY", **kwargs)
 
-        self.yaml_files = []
-        self.sub_dirs = []
+        self._files = []
+        self._dirs = []
 
         self.parse()
 
@@ -37,32 +37,38 @@ class PyGenParser(PyGenElement):
         - Note: .yaml files prefixed with _ character are treated differently.
         """
 
-        debug.info("Parsing directory:", self.path)
+        debug.debug("Parsing directory:", self.path)
 
         listing = os.listdir(self.path)
+
+        files = []
+        dirs = []
 
         for item in listing:
             path = os.path.join(self.path, item)
 
             if os.path.isdir(path):
-                self.sub_dirs.append(item)
+                dirs.append(item)
 
             if os.path.isfile(path) and item.endswith(".yaml"):
-                self.yaml_files.append(item)
+                files.append(item)
 
-        # Parse all files
-        for f in self.yaml_files:
+        if len(files) == 0:
+            debug.info("No protocol files found in directory '{d}'".format(d=self.path))
+
+        # Parse all protocol files
+        for f in files:
 
             if f.startswith("_"):
                 # TODO - Special files which augment the protocol generation
                 continue
 
-            p = PyGenFile(os.path.join(self.path, f), settings=self.settings)
+            self._files.append(PyGenFile(os.path.join(self.path, f), settings=self.settings))
 
         # Parse all subdirectories
-        for d in self.sub_dirs:
+        for d in dirs:
 
-            p = PyGenParser(os.path.join(self.path, d), settings=self.settings)
+            self._dirs.append(PyGenParser(os.path.join(self.path, d), settings=self.settings))
 
 
 class PyGenFile(PyGenElement):
@@ -84,7 +90,7 @@ class PyGenFile(PyGenElement):
         Parse an individual protocol file.
         """
 
-        debug.info("Parsing file:", self.path)
+        debug.debug("Parsing file:", self.path)
 
         with open(self.path, 'r') as yaml_file:
             self.data = yaml.safe_load(yaml_file)
@@ -111,5 +117,9 @@ class PyGenFile(PyGenElement):
 
         for enum in enums:
 
-            # TODO
-            pass
+            self.enums.append(PyGenEnumeration(
+                name=enum,
+                data=enums[enum],
+                path=self.path,
+                settings=self.settings
+            ))
