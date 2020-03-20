@@ -8,6 +8,7 @@ import os
 import yaml
 
 from .element import PyGenElement
+from .struct import PyGenStruct
 from .packet import PyGenPacket
 from .enumeration import PyGenEnumeration
 from . import debug
@@ -53,6 +54,14 @@ class PyGenParser(PyGenElement):
             if os.path.isfile(path) and item.endswith(".yaml"):
                 files.append(item)
 
+        # Parse any files first
+        self.parseFiles(files)
+
+        # Then parse any sub-directories
+        self.parseSubDirs(dirs)
+
+    def parseFiles(self, files):
+
         if len(files) == 0:
             debug.info("No protocol files found in directory '{d}'".format(d=self.path))
 
@@ -65,7 +74,7 @@ class PyGenParser(PyGenElement):
 
             self._files.append(PyGenFile(os.path.join(self.path, f), settings=self.settings))
 
-        # Parse all subdirectories
+    def parseSubDirs(self, dirs):
         for d in dirs:
 
             self._dirs.append(PyGenParser(os.path.join(self.path, d), settings=self.settings))
@@ -73,10 +82,12 @@ class PyGenParser(PyGenElement):
 
 class PyGenFile(PyGenElement):
 
+    KEY_STRUCTS = "structs"
     KEY_PACKETS = "packets"
     KEY_ENUMS = "enumerations"
 
     _VALID_KEYS = [
+        KEY_STRUCTS,
         KEY_PACKETS,
         KEY_ENUMS
     ]
@@ -90,6 +101,7 @@ class PyGenFile(PyGenElement):
 
         self.enums = []
         self.packets = []
+        self.structs = []
 
         self.parse()
 
@@ -103,8 +115,22 @@ class PyGenFile(PyGenElement):
         with open(self.path, 'r') as yaml_file:
             self.data = yaml.safe_load(yaml_file)
 
+        self.parseStructs()
         self.parsePackets()
         self.parseEnums()
+
+    def parseStructs(self):
+
+        structs = self.data.get(self.KEY_STRUCTS, {})
+
+        for struct in structs:
+            
+            self.structs.append(PyGenStruct(
+                name=struct,
+                data=structs[struct],
+                path=self.path,
+                settings=self.settings
+            ))
 
     def parsePackets(self):
         

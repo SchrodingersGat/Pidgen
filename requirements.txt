@@ -1,1 +1,3 @@
-colorama==0.4.3     # Pretty text printing
+pyyaml==5.3.1               # YAML parsing
+colorama==0.4.3             # Pretty text printing
+flake8==3.3.0               # PEP checking

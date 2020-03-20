@@ -13,6 +13,15 @@ class PyGenElement():
     
     """
 
+    # Generic keys we can expect for most element types
+    KEY_NAME = "name"
+    KEY_COMMENT = "comment"
+
+    _BASIC_KEYS = [
+        KEY_NAME,
+        KEY_COMMENT
+    ]
+
     # Default implementation of _VALID_KEYS is empty
     _VALID_KEYS = []
 
@@ -42,6 +51,16 @@ class PyGenElement():
 
         self.validateKeys()
 
+    @property
+    def required_keys(self):
+        """ Return a list of keys required for this element """
+        return self._REQUIRED_KEYS
+
+    @property
+    def allowed_keys(self):
+        """ Return a list of keys allowed for this element """
+        return self._BASIC_KEYS + self._VALID_KEYS
+
     def validateKeys(self):
         """
         Ensure that the tags provided under this element are valid.
@@ -49,7 +68,7 @@ class PyGenElement():
 
         # Check that any required keys are provided
         provided = [key.lower() for key in self.data]
-        for key in self._REQUIRED_KEYS:
+        for key in self.required_keys:
             if key not in provided:
                 debug.warning("Required key '{k}' missing from '{name}' in {f}".format(
                     k=key,
@@ -59,7 +78,7 @@ class PyGenElement():
 
         # Check for unknown keys
         for el in self.data:
-            if el.lower() not in self._VALID_KEYS:
+            if el.lower() not in self.allowed_keys:
                 debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
                     k=el,
                     name=self.name,

@@ -5,9 +5,19 @@ dist: xenial
 language: python
 
 python:
-  - 2.7
   - 3.6
+  - 3.7
+
+before_install:
+  - sudo apt-get install python3-pip python3-coverage
+
+install:
+  - pip install -r requirements.txt
 
 script:
   # Check code style
   - flake8 .
+  # TODO - Run coverage tests
+
+after_success:
+  - coveralls
