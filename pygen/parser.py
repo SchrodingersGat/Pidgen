@@ -113,7 +113,11 @@ class PyGenFile(PyGenElement):
         debug.debug("Parsing file:", self.path)
 
         with open(self.path, 'r') as yaml_file:
-            self.data = yaml.safe_load(yaml_file)
+            try:
+                self.data = yaml.safe_load(yaml_file)
+            except yaml.parser.ParserError as e:
+                debug.error("Error parsing file -", self.path)
+                debug.error(e, fail=True)
 
         self.parseStructs()
         self.parsePackets()
