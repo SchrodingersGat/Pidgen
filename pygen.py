@@ -14,6 +14,7 @@ import os
 import sys
 
 from pygen.version import PYGEN_VERSION
+from pygen.parser import PyGenParser
 
 
 def fail(*arg):
@@ -48,6 +49,9 @@ def main():
 
     print("Loading protocol from '{d}'".format(d=protocol_dir))
 
+    protocol = PyGenParser(protocol_dir)
+
+    protocol.parse()
 
 if __name__ == '__main__':
     main()
