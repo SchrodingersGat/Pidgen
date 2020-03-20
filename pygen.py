@@ -15,14 +15,12 @@ import sys
 
 from pygen.version import PYGEN_VERSION
 from pygen.parser import PyGenParser
-
-
-def fail(*arg):
-    print("Error:", *arg)
-    sys.exit(1)
+import pygen.debug as debug
 
 
 def main():
+
+    debug.message("PyGen v{version}".format(version=PYGEN_VERSION))
 
     parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool")
 
@@ -36,20 +34,20 @@ def main():
 
     args = parser.parse_args()
 
-    debug_level = args.verbose if args.verbose is not None else 0
+    debug.setDebugLevel(args.verbose if args.verbose is not None else 0)
 
     # Extract the protocol directory, and ensure that it is a valid directory
     protocol_dir = args.protocol
 
     if not os.path.exists(protocol_dir):
-        fail("Directory '{d}' does not exist".format(d=protocol_dir))
+        debug.error("Directory '{d}' does not exist".format(d=protocol_dir), fail=True)
 
     if not os.path.isdir(protocol_dir):
-        fail("Directory '{d}' is not a valid directory".format(d=protocol_dir))
+        debug.error("Directory '{d}' is not a valid directory".format(d=protocol_dir), fail=True)
 
-    print("Loading protocol from '{d}'".format(d=protocol_dir))
+    debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
-    protocol = PyGenParser(protocol_dir)
+    protocol = PyGenParser(protocol_dir, settings={})
 
 
 if __name__ == '__main__':

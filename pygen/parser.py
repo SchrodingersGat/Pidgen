@@ -10,6 +10,7 @@ import yaml
 from .element import PyGenElement
 from .packet import PyGenPacket
 from .enumeration import PyGenEnumeration
+from . import debug
 
 
 class PyGenParser(PyGenElement):
@@ -17,13 +18,12 @@ class PyGenParser(PyGenElement):
     Class for parsing a directory of protocol definition files.
     """
 
-    def __init__(self, path, **kwargs):
+    def __init__(self, dirpath, **kwargs):
 
-        kwargs["path"] = path
+        if "path" not in kwargs:
+            kwargs["path"] = dirpath
 
         PyGenElement.__init__(self, "DIRECTORY", **kwargs)
-
-        print(self)
 
         self.yaml_files = []
         self.sub_dirs = []
@@ -37,6 +37,8 @@ class PyGenParser(PyGenElement):
         - Note: .yaml files prefixed with _ character are treated differently.
         """
 
+        debug.info("Parsing directory:", self.path)
+
         listing = os.listdir(self.path)
 
         for item in listing:
@@ -48,40 +50,41 @@ class PyGenParser(PyGenElement):
             if os.path.isfile(path) and item.endswith(".yaml"):
                 self.yaml_files.append(item)
 
-        print("Directory:", self.path)
-
         # Parse all files
         for f in self.yaml_files:
 
             if f.startswith("_"):
-                # TODO
+                # TODO - Special files which augment the protocol generation
                 continue
 
-            p = PyGenFile(os.path.join(self.path, f))
-            p.parse()
+            p = PyGenFile(os.path.join(self.path, f), settings=self.settings)
 
         # Parse all subdirectories
         for d in self.sub_dirs:
 
-            p = PyGenParser(os.path.join(self.path, d))
-            p.parse()
+            p = PyGenParser(os.path.join(self.path, d), settings=self.settings)
 
 
 class PyGenFile(PyGenElement):
 
-    def __init__(self, path, **kwargs):
+    def __init__(self, filepath, **kwargs):
 
-        kwargs["path"] = path
+        if "path" not in kwargs:
+            kwargs["path"] = filepath
 
         PyGenElement.__init__(self, "FILE", **kwargs)
-
-        print(self)
 
         self.enums = []
         self.packets = []
 
+        self.parse()
+
     def parse(self):
-        print("Parsing file: ", self.path, self.namespace)
+        """
+        Parse an individual protocol file.
+        """
+
+        debug.info("Parsing file:", self.path)
 
         with open(self.path, 'r') as yaml_file:
             self.data = yaml.safe_load(yaml_file)
@@ -98,7 +101,8 @@ class PyGenFile(PyGenElement):
             self.packets.append(PyGenPacket(
                 name=packet,
                 data=packets[packet],
-                path=self.path
+                path=self.path,
+                settings=self.settings
             ))
 
     def parseEnums(self):
@@ -107,4 +111,5 @@ class PyGenFile(PyGenElement):
 
         for enum in enums:
 
-            self.enums.append(PyGenEnumeration(enum))
+            # TODO
+            pass

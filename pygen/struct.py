@@ -56,8 +56,6 @@ class PyGenData(PyGenElement):
 
         self.parse()
 
-        print(self)
-
     def parse(self):
         pass
 

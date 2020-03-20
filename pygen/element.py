@@ -20,18 +20,30 @@ class PyGenElement():
             name - Local name of the element
             path - Logical file path of the current element
             data - Data structure (dictionary) loaded from source .yaml file
-        
+            verbosity - Verbosity level of debug output
         """
+
+        # Store a copy of the kwargs
+        self.kwargs = kwargs
 
         self.name = kwargs.get("name", "")
         self.path = kwargs.get("path", "")
         self.data = kwargs.get("data", {})
 
+        # Store settings dict (default = empty dict)
+        self.settings = kwargs.get("settings", {})
+
         # Default element name (sub-classes should override)
         self.element_type = element_type
 
-        self.warnings = []
-        self.errors = []
+    @property
+    def verbosity(self):
+        """
+        Get the message 'verbosity' level.
+        By default, ERROR and WARNING messages are displayed.
+        """
+        return self.settings.get('verbosity', self._MSG_WARN)
+
 
     @property
     def level(self):
@@ -51,26 +63,6 @@ class PyGenElement():
     def namespace(self):
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
-
-    def warning(self, msg):
-        """
-        Print a warning message
-        """
-
-        warning = "{path}: WARNING - {msg}".format(path=self.path, msg=msg)
-
-        print(warning)
-        self.warnings.append(warning)
-
-    def error(self, msg):
-        """
-        Print an error message
-        """
-
-        error = "{path}: ERROR - {msg}".format(path=self.path, msg=msg)
-
-        print(error)
-        self.errors.append(error)
 
     def __str__(self):
         """ String representation of this item. """

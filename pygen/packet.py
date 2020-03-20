@@ -9,8 +9,6 @@ class PyGenPacket(PyGenElement):
 
         PyGenElement.__init__(self, "PACKET", **kwargs)
 
-        print(self)
-
         self.entries = []
 
         self.parse()
