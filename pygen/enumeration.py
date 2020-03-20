@@ -43,6 +43,9 @@ class PyGenEnumeration(PyGenElement):
         # Keep track of which values have been observed
         values_seen = set()
 
+        # Keep track of the enumeration key:value pairs
+        self._values = {}
+
         for item in values:
 
             data = values[item]
@@ -149,6 +152,9 @@ class PyGenEnumeration(PyGenElement):
             # Increment the index for the next loop
             idx = idx + 1
 
+            # Record this enumeration
+            self._values[item] = value
+
             debug.debug("Found enumeration value:", self.renderKey(item), "->", value)
 
     @property
@@ -165,3 +171,45 @@ class PyGenEnumeration(PyGenElement):
             key = key.upper()
 
         return self.prefix + key
+
+    @property
+    def keys(self):
+        """ Return the available enumeration keys """
+        return [k for k in self._values.keys()]
+
+    @property
+    def values(self):
+        """ Return a set of values defined for this enumeration """
+        v = set()
+
+        for k in self.keys:
+            v.add(self.getValue(k))
+        
+        return v
+
+    def getValue(self, key):
+        """ Return the value associated with the provided key """
+        if key in self.keys:
+            return self._values[key]
+        else:
+            debug.warning("Enum '{e}' does not contain the key '{k}' - {f}".format(
+                e=self.name,
+                k=key,
+                f=self.path
+            ))
+
+        return None
+
+    def getKey(self, value):
+        """ Return the key associated with the provided value """
+        for k in self.keys:
+            if self._values[k] == value:
+                return k
+
+        debug.warning("Enum '{e}' does not contain the value '{v}' - {f}".format(
+            e=self.name,
+            v=value,
+            f=self.path
+        ))
+
+        return None
