@@ -51,5 +51,6 @@ def main():
 
     protocol = PyGenParser(protocol_dir)
 
+
 if __name__ == '__main__':
     main()
