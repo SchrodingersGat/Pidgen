@@ -2,7 +2,7 @@
 
 import setuptools
 
-from pygen.version import PYGEN_VERSION
+from PyGen.version import PYGEN_VERSION
 
 with open("README.md", "r") as readme:
     long_description = readme.read()

@@ -2,7 +2,6 @@
 
 """
 Run this script to parse a set of protocol files using PyGen.
-Assuming the PyGen package is correctly installed:
 
 python -m PyGen <path/to/protocol>
 

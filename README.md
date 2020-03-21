@@ -4,3 +4,12 @@
 
 PyGen is a protocol generation tool ..
 
+## Running PyGen
+
+To run the PyGen tool against a set of protocol files:
+
+```python -m PyGen [path/to/protocol/files]```
+
+To display help and available options:
+
+```python -m PyGen -h```
