@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from .struct import PyGenStruct
+from .struct import PidgenStruct
 from . import debug
 
 
-class PyGenPacket(PyGenStruct):
+class PidgenPacket(PidgenStruct):
     """
     A Packet is a sub-set of a struct.
     """
 
     def __init__(self, **kwargs):
 
-        PyGenStruct.__init__(self, **kwargs)
+        PidgenStruct.__init__(self, **kwargs)
 
         self.parse_packet()
 

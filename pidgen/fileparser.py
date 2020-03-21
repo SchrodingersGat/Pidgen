@@ -6,15 +6,15 @@ File parsing
 
 import yaml
 
-from .element import PyGenElement
-from .struct import PyGenStruct
-from .packet import PyGenPacket
-from .enumeration import PyGenEnumeration
+from .element import PidgenElement
+from .struct import PidgenStruct
+from .packet import PidgenPacket
+from .enumeration import PidgenEnumeration
 
 from . import debug
 
 
-class PyGenFileParser(PyGenElement):
+class PidgenFileParser(PidgenElement):
 
     KEY_STRUCTS = "structs"
     KEY_PACKETS = "packets"
@@ -31,7 +31,7 @@ class PyGenFileParser(PyGenElement):
         if "path" not in kwargs:
             kwargs["path"] = filepath
 
-        PyGenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, **kwargs)
 
         self.enums = []
         self.packets = []
@@ -63,7 +63,7 @@ class PyGenFileParser(PyGenElement):
 
         for struct in structs:
             
-            self.structs.append(PyGenStruct(
+            self.structs.append(PidgenStruct(
                 name=struct,
                 data=structs[struct],
                 path=self.path,
@@ -76,7 +76,7 @@ class PyGenFileParser(PyGenElement):
 
         for packet in packets:
 
-            self.packets.append(PyGenPacket(
+            self.packets.append(PidgenPacket(
                 name=packet,
                 data=packets[packet],
                 path=self.path,
@@ -89,7 +89,7 @@ class PyGenFileParser(PyGenElement):
 
         for enum in enums:
 
-            self.enums.append(PyGenEnumeration(
+            self.enums.append(PidgenEnumeration(
                 name=enum,
                 data=enums[enum],
                 path=self.path,

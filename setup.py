@@ -42,5 +42,5 @@ setuptools.setup(
         'flake8'
     ],
 
-    python_requires = ">=2.7"
+    python_requires=">=2.7"
 )

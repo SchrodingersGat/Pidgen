@@ -1,15 +1,15 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Build Status](https://travis-ci.org/SchrodingersGat/PyGen.svg?branch=master)](https://travis-ci.org/SchrodingersGat/PyGen)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Build Status](https://travis-ci.org/SchrodingersGat/Pidgen.svg?branch=master)](https://travis-ci.org/SchrodingersGat/Pidgen)
 
-## PyGen - Embedded Protocol Generation Tool
+## Pidgen - Embedded Protocol Generation Tool
 
-PyGen is a protocol generation tool ..
+Pidgen is a protocol generation tool ..
 
-## Running PyGen
+## Running Pidgen
 
-To run the PyGen tool against a set of protocol files:
+To run the Pidgen tool against a set of protocol files:
 
-```python -m PyGen [path/to/protocol/files]```
+```python -m pidgen [path/to/protocol/files]```
 
 To display help and available options:
 
-```python -m PyGen -h```
+```python -m pidgen -h```

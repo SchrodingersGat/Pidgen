@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Run this script to parse a set of protocol files using PyGen.
+Run this script to parse a set of protocol files using Pidgen.
 
-python -m PyGen <path/to/protocol>
+python -m Pidgen <path/to/protocol>
 
 For help, run:
 
-python -m PyGen -h
+python -m Pidgen -h
 """
 
 from __future__ import print_function
@@ -17,7 +17,7 @@ import os
 import sys
 
 from .version import PIDGEN_VERSION
-from .directoryparser import PyGenDirectoryParser
+from .directoryparser import PidgenDirectoryParser
 from . import debug
 
 __version__ = PIDGEN_VERSION
@@ -25,7 +25,7 @@ __version__ = PIDGEN_VERSION
 
 def main():
 
-    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool - v{version}".format(version=PIDGEN_VERSION))
+    parser = argparse.ArgumentParser(description="Pidgen - Protocol Generation Tool - v{version}".format(version=PIDGEN_VERSION))
 
     # Position arguments
     parser.add_argument("protocol", help="Path to top-level protocol directory")
@@ -33,7 +33,7 @@ def main():
     # Optional arguments
     parser.add_argument("-v", "--verbose", help="Print verbose output", action="count")
 
-    parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PIDGEN_VERSION))
+    parser.add_argument("--version", action="version", version="Pidgen version: {v}".format(v=PIDGEN_VERSION))
 
     args = parser.parse_args()
 
@@ -49,7 +49,7 @@ def main():
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
     # Parse the protocol
-    PyGenDirectoryParser(protocol_dir, settings={})
+    PidgenDirectoryParser(protocol_dir, settings={})
 
     errors = debug.getErrorCount()
 

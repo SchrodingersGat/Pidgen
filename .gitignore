@@ -4,4 +4,4 @@
 # PIP build
 build/
 dist/
-PyGen.egg-info/
+pidgen.egg-info/

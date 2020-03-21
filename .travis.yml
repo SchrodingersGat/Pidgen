@@ -1,4 +1,4 @@
-# Travis-CI integration for PyGen
+# Travis-CI integration for pidgen
 
 dist: xenial
 
@@ -9,7 +9,7 @@ python:
   - 3.7
 
 before_install:
-  - sudo apt-get install python3-pip python3-coverage
+  - sudo apt-get install python-pip python-coverage
 
 install:
   - pip install -r requirements.txt
@@ -18,9 +18,9 @@ script:
   # Check code style
   - flake8 .
   # Ensure that the script at least runs (display help information)
-  - python -m PyGen -h
+  - python -m pidgen -h
   # Show version information
-  - python -m PyGen --version
+  - python -m pidgen --version
   # TODO - Run coverage tests
 
 after_success:

@@ -6,12 +6,12 @@ Directory parsing
 """
 
 import os
-from .element import PyGenElement
-from .fileparser import PyGenFileParser
+from .element import PidgenElement
+from .fileparser import PidgenFileParser
 from . import debug
 
 
-class PyGenDirectoryParser(PyGenElement):
+class PidgenDirectoryParser(PidgenElement):
     """
     Class for parsing a directory of protocol definition files.
     """
@@ -21,7 +21,7 @@ class PyGenDirectoryParser(PyGenElement):
         if "path" not in kwargs:
             kwargs["path"] = dirpath
 
-        PyGenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, **kwargs)
 
         self._files = []
         self._dirs = []
@@ -69,9 +69,9 @@ class PyGenDirectoryParser(PyGenElement):
                 # TODO - Special files which augment the protocol generation
                 continue
 
-            self._files.append(PyGenFileParser(os.path.join(self.path, f), settings=self.settings))
+            self._files.append(PidgenFileParser(os.path.join(self.path, f), settings=self.settings))
 
     def parseSubDirs(self, dirs):
         for d in dirs:
 
-            self._dirs.append(PyGenDirectoryParser(os.path.join(self.path, d), settings=self.settings))
+            self._dirs.append(PidgenDirectoryParser(os.path.join(self.path, d), settings=self.settings))

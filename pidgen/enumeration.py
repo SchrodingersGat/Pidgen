@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from .element import PyGenElement
+from .element import PidgenElement
 from . import debug
 
 
-class PyGenEnumeration(PyGenElement):
+class PidgenEnumeration(PidgenElement):
     """
-    The PyGenEnumeration class provides support for integer enumerations.
+    The PidgenEnumeration class provides support for integer enumerations.
     """
 
     # Keys associated with the enumeration
@@ -27,7 +27,7 @@ class PyGenEnumeration(PyGenElement):
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, **kwargs)
 
         self.parse()
 
