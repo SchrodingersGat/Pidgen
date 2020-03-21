@@ -49,7 +49,7 @@ def main():
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
     # Parse the protocol
-    PidgenDirectoryParser(protocol_dir, settings={})
+    PidgenDirectoryParser(None, protocol_dir, settings={})
 
     errors = debug.getErrorCount()
 

@@ -61,9 +61,24 @@ class PidgenData(PidgenElement):
         DATA_STR: ["str", "string", "text"],
     }
 
-    def __init__(self, **kwargs):
+    # Width of each data type (bits)
+    _DATA_WIDTH_BITS = {
+        DATA_U8: 8,
+        DATA_S8: 8,
+        DATA_U16: 16,
+        DATA_S16: 16,
+        DATA_U32: 32,
+        DATA_S32: 32,
+        DATA_U64: 64,
+        DATA_S64: 64,
+        DATA_F16: 16,
+        DATA_F32: 32,
+        DATA_F64: 64,
+    }
 
-        PidgenElement.__init__(self, **kwargs)
+    def __init__(self, parent, **kwargs):
+
+        PidgenElement.__init__(self, parent, **kwargs)
 
         self.parse()
 

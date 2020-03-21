@@ -32,9 +32,12 @@ class PidgenElement():
     _TRUE = ["y", "yes", "1", "true", "on"]
     _FALSE = ["n", "no", "0", "false", "off"]
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
         """
         Initialize the element with some basic information
+
+        args:
+            parent - Parent object for this object. e.g. directory -> file -> packet -> struct -> data
 
         kwargs:
             name - Local name of the element
@@ -42,6 +45,8 @@ class PidgenElement():
             data - Data structure (dictionary) loaded from source .yaml file
             verbosity - Verbosity level of debug output
         """
+
+        self.parent = parent
 
         # Store a copy of the kwargs
         self.kwargs = kwargs
@@ -54,6 +59,19 @@ class PidgenElement():
         self.settings = kwargs.get("settings", {})
 
         self.validateKeys()
+
+    @property
+    def ancestors(self):
+        """ Return flattened list of ancestors for this object """
+        a = []
+
+        parent = self.parent
+
+        while parent is not None:
+            a.append(parent)
+            parent = parent.parent
+
+        return a
 
     @property
     def required_keys(self):

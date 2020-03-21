@@ -26,12 +26,12 @@ class PidgenFileParser(PidgenElement):
         KEY_ENUMS
     ]
 
-    def __init__(self, filepath, **kwargs):
+    def __init__(self, parent, filepath, **kwargs):
 
-        if "path" not in kwargs:
-            kwargs["path"] = filepath
+        # Override the path argument
+        kwargs["path"] = filepath
 
-        PidgenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, parent, **kwargs)
 
         self.enums = []
         self.packets = []
@@ -76,7 +76,7 @@ class PidgenFileParser(PidgenElement):
 
         for packet in packets:
 
-            self.packets.append(PidgenPacket(
+            self.packets.append(PidgenPacket(self,
                 name=packet,
                 data=packets[packet],
                 path=self.path,
@@ -89,7 +89,7 @@ class PidgenFileParser(PidgenElement):
 
         for enum in enums:
 
-            self.enums.append(PidgenEnumeration(
+            self.enums.append(PidgenEnumeration(self,
                 name=enum,
                 data=enums[enum],
                 path=self.path,
