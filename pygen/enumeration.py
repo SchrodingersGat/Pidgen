@@ -48,7 +48,11 @@ class PyGenEnumeration(PyGenElement):
 
         for item in values:
 
+            # Extract the data associated with this enum entry
             data = values[item]
+
+            # Create an empty dict to store information about this enum value
+            item_attributes = {}
 
             """
             The simplest way to specify an enumeration value is simply with a "key" line:
@@ -125,6 +129,10 @@ class PyGenEnumeration(PyGenElement):
                 else:
                     value = idx
 
+                # Copy across all other data (for later use)
+                for k in data.keys():
+                    item_attributes[k] = data[k]
+
             else:
                 debug.error("Unknown value for enum '{e}': {i} = '{v}' - {f}".format(
                     e=self.name,
@@ -135,8 +143,6 @@ class PyGenEnumeration(PyGenElement):
 
                 # Revert to the current index
                 value = idx
-
-            data = values[item]
 
             # Check that the computed value has not been seen previously
             if value in values_seen:
@@ -149,13 +155,15 @@ class PyGenEnumeration(PyGenElement):
             else:
                 values_seen.add(value)
 
+            item_attributes[self.KEY_VALUE] = value
+
             # Increment the index for the next loop
             idx = idx + 1
 
             # Record this enumeration
-            self._values[item] = value
+            self._values[item] = item_attributes
 
-            debug.debug("Found enumeration value:", self.renderKey(item), "->", value)
+            debug.debug("Found enumeration value:", self.renderKey(item), "->", self.getValue(item))
 
     @property
     def prefix(self):
@@ -180,15 +188,21 @@ class PyGenEnumeration(PyGenElement):
     @property
     def values(self):
         """ Return a set of values defined for this enumeration """
+
         v = set()
 
-        for k in self.keys:
-            v.add(self.getValue(k))
-        
+        for key in self.keys:
+            value = self.getValue(key)
+            if value:
+                v.add(value)
+
         return v
 
-    def getValue(self, key):
-        """ Return the value associated with the provided key """
+    def getData(self, key):
+        """
+        Return the dataset associated with the provided key.
+        If an invalid key is provided, an empty dict is returned.
+        """
         if key in self.keys:
             return self._values[key]
         else:
@@ -198,7 +212,17 @@ class PyGenEnumeration(PyGenElement):
                 f=self.path
             ))
 
-        return None
+            return {}
+
+    def getValue(self, key):
+        """ Return the value associated with the provided key """
+
+        return self.getData(key).get(self.KEY_VALUE, None)
+
+    def getComment(self, key):
+        """ Return the comment associated with the provided key """
+
+        return self.getData(key).get(self.KEY_COMMENT, "")
 
     def getKey(self, value):
         """ Return the key associated with the provided value """
