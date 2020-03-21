@@ -25,9 +25,7 @@ __version__ = PYGEN_VERSION
 
 def main():
 
-    debug.message("PyGen v{version}".format(version=PYGEN_VERSION))
-
-    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool")
+    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool - v{version}".format(version=PYGEN_VERSION))
 
     # Position arguments
     parser.add_argument("protocol", help="Path to top-level protocol directory")

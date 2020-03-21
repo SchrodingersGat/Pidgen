@@ -17,6 +17,10 @@ install:
 script:
   # Check code style
   - flake8 .
+  # Ensure that the script at least runs (display help information)
+  - python -m PyGen -h
+  # Show version information
+  - python -m PyGen --version
   # TODO - Run coverage tests
 
 after_success:
