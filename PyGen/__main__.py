@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-    @package
+Run this script to parse a set of protocol files using PyGen.
+Assuming the PyGen package is correctly installed:
 
-    pygen - Low level protocol generation tool.
+python -m PyGen <path/to/protocol>
 
+For help, run:
+
+python -m PyGen -h
 """
 
 from __future__ import print_function
@@ -13,9 +17,11 @@ import argparse
 import os
 import sys
 
-from pygen.version import PYGEN_VERSION
-from pygen.directory import PyGenDirectoryParser
-import pygen.debug as debug
+from .version import PYGEN_VERSION
+from .directoryparser import PyGenDirectoryParser
+from . import debug
+
+__version__ = PYGEN_VERSION
 
 
 def main():

@@ -7,7 +7,7 @@ Directory parsing
 
 import os
 from .element import PyGenElement
-from .file import PyGenFileParser
+from .fileparser import PyGenFileParser
 from . import debug
 
 
