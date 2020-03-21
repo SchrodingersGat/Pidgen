@@ -46,7 +46,12 @@ class PidgenElement():
             verbosity - Verbosity level of debug output
         """
 
+        self.children = []
+
         self.parent = parent
+
+        if self.parent is not None:
+            self.parent.addChild(self)
 
         # Store a copy of the kwargs
         self.kwargs = kwargs
@@ -72,6 +77,29 @@ class PidgenElement():
             parent = parent.parent
 
         return a
+
+    def getDescendants(self, descendants=[]):
+        """
+        Return a flattened list of all descendants of this object (recursive)
+
+        Args:
+            descendants - Flat list of descendants, passed down to lower function calls
+        """
+
+        for child in self.children:
+            # Add the child to the list
+            descendants.append(child)
+
+            # Child then adds its own descendants to the list
+            child.getDescendants(descendants)
+
+        return descendants
+
+    def addChild(self, child):
+        """ Add a new child object """
+
+        if child not in self.children:
+            self.children.append(child)
 
     @property
     def required_keys(self):
