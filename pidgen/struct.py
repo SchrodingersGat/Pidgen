@@ -21,9 +21,9 @@ class PidgenStruct(PidgenElement):
         KEY_DATA,
     ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
 
-        PidgenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, parent, **kwargs)
 
         # List of variables which exist in this struct
         self.variables = []
@@ -53,6 +53,7 @@ class PidgenStruct(PidgenElement):
             # Is the variable a 'struct'?
             if PidgenData.KEY_STRUCT in var:
                 self.variables.append(PidgenStruct(
+                    self,
                     name=var,
                     data=var_data,
                     path=self.path,
@@ -61,6 +62,7 @@ class PidgenStruct(PidgenElement):
 
             else:
                 self.variables.append(PidgenData(
+                    self,
                     name=var,
                     data=var_data,
                     path=self.path,

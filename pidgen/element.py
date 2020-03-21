@@ -28,9 +28,16 @@ class PidgenElement():
     # Default implementation of _REQUIRED_KEYS is empty
     _REQUIRED_KEYS = []
 
-    def __init__(self, **kwargs):
+    # Options for specifying a "true" value
+    _TRUE = ["y", "yes", "1", "true", "on"]
+    _FALSE = ["n", "no", "0", "false", "off"]
+
+    def __init__(self, parent, **kwargs):
         """
         Initialize the element with some basic information
+
+        args:
+            parent - Parent object for this object. e.g. directory -> file -> packet -> struct -> data
 
         kwargs:
             name - Local name of the element
@@ -38,6 +45,13 @@ class PidgenElement():
             data - Data structure (dictionary) loaded from source .yaml file
             verbosity - Verbosity level of debug output
         """
+
+        self.children = []
+
+        self.parent = parent
+
+        if self.parent is not None:
+            self.parent.addChild(self)
 
         # Store a copy of the kwargs
         self.kwargs = kwargs
@@ -50,6 +64,42 @@ class PidgenElement():
         self.settings = kwargs.get("settings", {})
 
         self.validateKeys()
+
+    @property
+    def ancestors(self):
+        """ Return flattened list of ancestors for this object """
+        a = []
+
+        parent = self.parent
+
+        while parent is not None:
+            a.append(parent)
+            parent = parent.parent
+
+        return a
+
+    def getDescendants(self, descendants=[]):
+        """
+        Return a flattened list of all descendants of this object (recursive)
+
+        Args:
+            descendants - Flat list of descendants, passed down to lower function calls
+        """
+
+        for child in self.children:
+            # Add the child to the list
+            descendants.append(child)
+
+            # Child then adds its own descendants to the list
+            child.getDescendants(descendants)
+
+        return descendants
+
+    def addChild(self, child):
+        """ Add a new child object """
+
+        if child not in self.children:
+            self.children.append(child)
 
     @property
     def required_keys(self):
@@ -112,3 +162,30 @@ class PidgenElement():
     def namespace(self):
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
+
+    def checkBoolValue(self, value):
+        """
+        Check if a value looks like a True or a False value
+        """
+
+        value = str(value).lower().strip()
+
+        if value in self._TRUE:
+            return True
+
+        elif value in self._FALSE:
+            return False
+
+        else:
+            debug.warning("Value '{v}' not a boolean value - {f}".format(v=value, f=self.path))
+            return False
+
+    def checkBool(self, key):
+        """
+        Check if the supplied key maps to a boolean parameter
+        """
+
+        if key in self.data:
+            return self.checkBoolValue(self.data[key])
+        else:
+            return False

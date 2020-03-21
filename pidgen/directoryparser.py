@@ -16,12 +16,11 @@ class PidgenDirectoryParser(PidgenElement):
     Class for parsing a directory of protocol definition files.
     """
 
-    def __init__(self, dirpath, **kwargs):
+    def __init__(self, parent, dirpath, **kwargs):
 
-        if "path" not in kwargs:
-            kwargs["path"] = dirpath
+        kwargs["path"] = dirpath
 
-        PidgenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, parent, **kwargs)
 
         self._files = []
         self._dirs = []
@@ -69,9 +68,9 @@ class PidgenDirectoryParser(PidgenElement):
                 # TODO - Special files which augment the protocol generation
                 continue
 
-            self._files.append(PidgenFileParser(os.path.join(self.path, f), settings=self.settings))
+            self._files.append(PidgenFileParser(self, os.path.join(self.path, f), settings=self.settings))
 
     def parseSubDirs(self, dirs):
         for d in dirs:
 
-            self._dirs.append(PidgenDirectoryParser(os.path.join(self.path, d), settings=self.settings))
+            self._dirs.append(PidgenDirectoryParser(self, os.path.join(self.path, d), settings=self.settings))

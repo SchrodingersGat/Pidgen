@@ -25,9 +25,9 @@ class PidgenEnumeration(PidgenElement):
         KEY_VALUES,
     ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
 
-        PidgenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, parent, **kwargs)
 
         self.parse()
 
