@@ -14,7 +14,7 @@ import os
 import sys
 
 from pygen.version import PYGEN_VERSION
-from pygen.parser import PyGenParser
+from pygen.directory import PyGenDirectoryParser
 import pygen.debug as debug
 
 
@@ -48,7 +48,7 @@ def main():
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
     # Parse the protocol
-    PyGenParser(protocol_dir, settings={})
+    PyGenDirectoryParser(protocol_dir, settings={})
 
     errors = debug.getErrorCount()
 
