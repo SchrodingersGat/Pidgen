@@ -28,6 +28,10 @@ class PidgenElement():
     # Default implementation of _REQUIRED_KEYS is empty
     _REQUIRED_KEYS = []
 
+    # Options for specifying a "true" value
+    _TRUE = ["y", "yes", "1", "true", "on"]
+    _FALSE = ["n", "no", "0", "false", "off"]
+
     def __init__(self, **kwargs):
         """
         Initialize the element with some basic information
@@ -112,3 +116,20 @@ class PidgenElement():
     def namespace(self):
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
+
+    def checkBool(self, value):
+        """
+        Check if a value looks like a True or a False value
+        """
+
+        value = str(value).lower().strip()
+
+        if value in self._TRUE:
+            return True
+
+        elif value in self._FALSE:
+            return False
+
+        else:
+            debug.warning("Value '{v}' not a boolean value - {f}".format(v=value, f=self.path))
+            return False
