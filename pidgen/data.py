@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from .element import PyGenElement
+from .element import PidgenElement
 from . import debug
 
 
-class PyGenData(PyGenElement):
+class PidgenData(PidgenElement):
     """
-    A PyGenData object is a basic data entry,
+    A PidgenData object is a basic data entry,
     which can be defined in either a struct or a packet
 
     Attributes:
@@ -63,7 +63,7 @@ class PyGenData(PyGenElement):
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, **kwargs)
 
         self.parse()
 

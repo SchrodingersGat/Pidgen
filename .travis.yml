@@ -1,22 +1,29 @@
-# Travis-CI integration for PyGen
+# Travis-CI integration for pidgen
 
 dist: xenial
 
 language: python
 
 python:
-  - 3.6
+  - 2.7
   - 3.7
 
 before_install:
-  - sudo apt-get install python3-pip python3-coverage
+  - sudo apt-get install python-pip python-coverage
 
 install:
   - pip install -r requirements.txt
+  - pip install wheel
 
 script:
   # Check code style
   - flake8 .
+  # Ensure that the script at least runs (display help information)
+  - python -m pidgen -h
+  # Show version information
+  - python -m pidgen --version
+  # Test that the package can be installed OK
+  - python setup.py bdist_wheel --universal
   # TODO - Run coverage tests
 
 after_success:

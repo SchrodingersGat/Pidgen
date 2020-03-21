@@ -6,9 +6,9 @@ import os
 from . import debug
 
 
-class PyGenElement():
+class PidgenElement():
     """
-    Base level PyGenElement class.
+    Base level PidgenElement class.
     Provides low-level functionality inherited by all higher classes
     
     """

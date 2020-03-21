@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from .element import PyGenElement
-from .data import PyGenData
+from .element import PidgenElement
+from .data import PidgenData
 from . import debug
 
 
-class PyGenStruct(PyGenElement):
+class PidgenStruct(PidgenElement):
     """
-    A PyGenStruct object is equivalent to a 'struct' in C-like languages.
+    A PidgenStruct object is equivalent to a 'struct' in C-like languages.
     It contains sequential data elements (which can be other structs).
     Structs can be arbitrarily nested
 
@@ -23,7 +23,7 @@ class PyGenStruct(PyGenElement):
 
     def __init__(self, **kwargs):
 
-        PyGenElement.__init__(self, **kwargs)
+        PidgenElement.__init__(self, **kwargs)
 
         # List of variables which exist in this struct
         self.variables = []
@@ -51,8 +51,8 @@ class PyGenStruct(PyGenElement):
             var_data = variables[var]
 
             # Is the variable a 'struct'?
-            if PyGenData.KEY_STRUCT in var:
-                self.variables.append(PyGenStruct(
+            if PidgenData.KEY_STRUCT in var:
+                self.variables.append(PidgenStruct(
                     name=var,
                     data=var_data,
                     path=self.path,
@@ -60,7 +60,7 @@ class PyGenStruct(PyGenElement):
                 ))
 
             else:
-                self.variables.append(PyGenData(
+                self.variables.append(PidgenData(
                     name=var,
                     data=var_data,
                     path=self.path,

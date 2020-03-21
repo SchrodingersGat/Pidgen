@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 """
-    @package
+Run this script to parse a set of protocol files using Pidgen.
 
-    pygen - Low level protocol generation tool.
+python -m Pidgen <path/to/protocol>
 
+For help, run:
+
+python -m Pidgen -h
 """
 
 from __future__ import print_function
@@ -13,16 +16,16 @@ import argparse
 import os
 import sys
 
-from pygen.version import PYGEN_VERSION
-from pygen.parser import PyGenParser
-import pygen.debug as debug
+from .version import PIDGEN_VERSION
+from .directoryparser import PidgenDirectoryParser
+from . import debug
+
+__version__ = PIDGEN_VERSION
 
 
 def main():
 
-    debug.message("PyGen v{version}".format(version=PYGEN_VERSION))
-
-    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool")
+    parser = argparse.ArgumentParser(description="Pidgen - Protocol Generation Tool - v{version}".format(version=PIDGEN_VERSION))
 
     # Position arguments
     parser.add_argument("protocol", help="Path to top-level protocol directory")
@@ -30,25 +33,23 @@ def main():
     # Optional arguments
     parser.add_argument("-v", "--verbose", help="Print verbose output", action="count")
 
-    parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PYGEN_VERSION))
+    parser.add_argument("--version", action="version", version="Pidgen version: {v}".format(v=PIDGEN_VERSION))
 
     args = parser.parse_args()
 
-    debug.setDebugLevel(args.verbose if args.verbose is not None else 0)
+    # Set the global debugging level
+    debug.setDebugLevel(int(args.verbose) if args.verbose is not None else debug.MSG_ERROR)
 
     # Extract the protocol directory, and ensure that it is a valid directory
     protocol_dir = args.protocol
 
-    if not os.path.exists(protocol_dir):
-        debug.error("Directory '{d}' does not exist".format(d=protocol_dir), fail=True)
-
-    if not os.path.isdir(protocol_dir):
+    if not os.path.exists(protocol_dir) or not os.path.isdir(protocol_dir):
         debug.error("Directory '{d}' is not a valid directory".format(d=protocol_dir), fail=True)
 
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))
 
     # Parse the protocol
-    PyGenParser(protocol_dir, settings={})
+    PidgenDirectoryParser(protocol_dir, settings={})
 
     errors = debug.getErrorCount()
 

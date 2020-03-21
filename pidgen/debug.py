@@ -93,7 +93,7 @@ def warning(*arg):
     _msg(Fore.YELLOW, MSG_CODES[MSG_WARN], *arg)
 
 
-def error(*arg, fail=False):  # noqa: E999
+def error(*arg, **kwargs):
     """
     Display an error message
     """
@@ -107,6 +107,8 @@ def error(*arg, fail=False):  # noqa: E999
     _msg(Fore.RED, MSG_CODES[MSG_ERROR], *arg)
 
     ERR_COUNT += 1
+
+    fail = kwargs.get('fail', False)
 
     if fail:
         sys.exit(ERR_COUNT)
