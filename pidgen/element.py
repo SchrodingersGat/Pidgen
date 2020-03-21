@@ -163,7 +163,7 @@ class PidgenElement():
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
 
-    def checkBool(self, value):
+    def checkBoolValue(self, value):
         """
         Check if a value looks like a True or a False value
         """
@@ -178,4 +178,14 @@ class PidgenElement():
 
         else:
             debug.warning("Value '{v}' not a boolean value - {f}".format(v=value, f=self.path))
+            return False
+
+    def checkBool(self, key):
+        """
+        Check if the supplied key maps to a boolean parameter
+        """
+
+        if key in self.data:
+            return self.checkBoolValue(self.data[key])
+        else:
             return False
