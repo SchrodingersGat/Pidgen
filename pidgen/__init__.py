@@ -10,4 +10,4 @@ from . import packet
 from . import data
 from . import version
 
-__version__ = version.PYGEN_VERSION
+__version__ = version.PIDGEN_VERSION

@@ -16,16 +16,16 @@ import argparse
 import os
 import sys
 
-from .version import PYGEN_VERSION
+from .version import PIDGEN_VERSION
 from .directoryparser import PyGenDirectoryParser
 from . import debug
 
-__version__ = PYGEN_VERSION
+__version__ = PIDGEN_VERSION
 
 
 def main():
 
-    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool - v{version}".format(version=PYGEN_VERSION))
+    parser = argparse.ArgumentParser(description="PyGen - Protocol Generation Tool - v{version}".format(version=PIDGEN_VERSION))
 
     # Position arguments
     parser.add_argument("protocol", help="Path to top-level protocol directory")
@@ -33,7 +33,7 @@ def main():
     # Optional arguments
     parser.add_argument("-v", "--verbose", help="Print verbose output", action="count")
 
-    parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PYGEN_VERSION))
+    parser.add_argument("--version", action="version", version="PyGen version: {v}".format(v=PIDGEN_VERSION))
 
     args = parser.parse_args()
 

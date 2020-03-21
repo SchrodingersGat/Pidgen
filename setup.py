@@ -2,21 +2,21 @@
 
 import setuptools
 
-from PyGen.version import PYGEN_VERSION
+from pidgen.version import PIDGEN_VERSION
 
 with open("README.md", "r") as readme:
     long_description = readme.read()
 
 setuptools.setup(
-    name="PyGen",
+    name="pidgen",
     
-    version=PYGEN_VERSION,
+    version=PIDGEN_VERSION,
     
     author="Oliver Walters",
     
     author_email="oliver.henry.walters@gmail.com",
     
-    description="Protocol Generation Tool",
+    description="Python-based Protocol Generation Tool",
     
     long_description_content_type="text/markdown",
     
@@ -24,7 +24,7 @@ setuptools.setup(
 
     keywords="protocol, generation, embedded",
     
-    url="https://github.com/SchrodingersGat/PyGen",
+    url="https://github.com/SchrodingersGat/pidgen",
 
     license="MIT",
     
@@ -40,7 +40,7 @@ setuptools.setup(
         'pyyaml',
         'colorama',
         'flake8'
-    ]
+    ],
 
-
+    python_requires = ">=2.7"
 )
