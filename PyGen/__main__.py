@@ -37,15 +37,13 @@ def main():
 
     args = parser.parse_args()
 
-    debug.setDebugLevel(args.verbose if args.verbose is not None else 0)
+    # Set the global debugging level
+    debug.setDebugLevel(int(args.verbose) if args.verbose is not None else debug.MSG_ERROR)
 
     # Extract the protocol directory, and ensure that it is a valid directory
     protocol_dir = args.protocol
 
-    if not os.path.exists(protocol_dir):
-        debug.error("Directory '{d}' does not exist".format(d=protocol_dir), fail=True)
-
-    if not os.path.isdir(protocol_dir):
+    if not os.path.exists(protocol_dir) or not os.path.isdir(protocol_dir):
         debug.error("Directory '{d}' is not a valid directory".format(d=protocol_dir), fail=True)
 
     debug.message("Loading protocol from '{d}'".format(d=protocol_dir))

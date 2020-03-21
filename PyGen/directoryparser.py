@@ -75,4 +75,3 @@ class PyGenDirectoryParser(PyGenElement):
         for d in dirs:
 
             self._dirs.append(PyGenDirectoryParser(os.path.join(self.path, d), settings=self.settings))
-
