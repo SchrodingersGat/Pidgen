@@ -13,6 +13,7 @@ before_install:
 
 install:
   - pip install -r requirements.txt
+  - pip install wheel
 
 script:
   # Check code style
@@ -21,6 +22,8 @@ script:
   - python -m pidgen -h
   # Show version information
   - python -m pidgen --version
+  # Test that the package can be installed OK
+  - python setup.py bdist_wheel --universal
   # TODO - Run coverage tests
 
 after_success:

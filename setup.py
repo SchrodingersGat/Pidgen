@@ -18,9 +18,9 @@ setuptools.setup(
     
     description="Python-based Protocol Generation Tool",
     
-    long_description_content_type="text/markdown",
-    
     long_description=long_description,
+    
+    long_description_content_type="text/markdown",
 
     keywords="protocol, generation, embedded",
     
