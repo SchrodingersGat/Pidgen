@@ -3,6 +3,8 @@
 from __future__ import print_function
 
 import os
+import yaml
+
 from . import debug
 
 
@@ -293,3 +295,17 @@ class PidgenElement():
             return self.parseBool(self.data[key])
         else:
             return False
+
+    def parseYaml(self, filename):
+        """
+        Parse an individual .yaml file
+        """
+
+        debug.debug("Parsing file:", filename)
+
+        with open(self.path, 'r') as yaml_file:
+            try:
+                self.data = yaml.safe_load(yaml_file)
+            except yaml.parser.ParserError as e:
+                debug.error("Error parsing file -", self.path)
+                debug.error(e, fail=True)

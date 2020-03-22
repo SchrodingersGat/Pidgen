@@ -18,6 +18,7 @@ enumerations:
       otter:
         value: 0b101010
 
+  # The CARS enumeration contains a list of values of different types of cars
   cars:
     prefix: CAR_
     values:

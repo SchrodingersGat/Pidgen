@@ -4,8 +4,6 @@
 File parsing
 """
 
-import yaml
-
 from .element import PidgenElement
 from .struct import PidgenStruct
 from .packet import PidgenPacket
@@ -44,14 +42,7 @@ class PidgenFileParser(PidgenElement):
         Parse an individual protocol file.
         """
 
-        debug.debug("Parsing file:", self.path)
-
-        with open(self.path, 'r') as yaml_file:
-            try:
-                self.data = yaml.safe_load(yaml_file)
-            except yaml.parser.ParserError as e:
-                debug.error("Error parsing file -", self.path)
-                debug.error(e, fail=True)
+        self.parseYaml(self.path)
 
         self.parseStructs()
         self.parsePackets()
