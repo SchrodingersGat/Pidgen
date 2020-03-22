@@ -66,8 +66,7 @@ class PidgenFileParser(PidgenElement):
             self.structs.append(PidgenStruct(
                 name=struct,
                 data=structs[struct],
-                path=self.path,
-                settings=self.settings
+                path=self.path
             ))
 
     def parsePackets(self):
@@ -80,8 +79,7 @@ class PidgenFileParser(PidgenElement):
                 self,
                 name=packet,
                 data=packets[packet],
-                path=self.path,
-                settings=self.settings
+                path=self.path
             ))
 
     def parseEnums(self):
@@ -94,6 +92,5 @@ class PidgenFileParser(PidgenElement):
                 self,
                 name=enum,
                 data=enums[enum],
-                path=self.path,
-                settings=self.settings
+                path=self.path
             ))

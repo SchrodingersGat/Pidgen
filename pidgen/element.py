@@ -15,11 +15,13 @@ class PidgenElement():
 
     # Generic keys we can expect for most element types
     KEY_NAME = "name"
+    KEY_TITLE = "title"
     KEY_COMMENT = "comment"
 
     _BASIC_KEYS = [
         KEY_NAME,
-        KEY_COMMENT
+        KEY_TITLE,
+        KEY_COMMENT,
     ]
 
     # Default implementation of _VALID_KEYS is empty
@@ -39,11 +41,10 @@ class PidgenElement():
         args:
             parent - Parent object for this object. e.g. directory -> file -> packet -> struct -> data
 
-        kwargs:
+        required kwargs:
             name - Local name of the element
             path - Logical file path of the current element
             data - Data structure (dictionary) loaded from source .yaml file
-            verbosity - Verbosity level of debug output
         """
 
         self.children = []
@@ -59,9 +60,6 @@ class PidgenElement():
         # Store the dataset associated with this object
         self.data = kwargs.get("data", {})
 
-        # Store settings dict (default = empty dict)
-        self.settings = kwargs.get("settings", {})
-
         self.validateKeys()
 
     @property
@@ -69,6 +67,16 @@ class PidgenElement():
         """ Return the 'name' for this object """
 
         return self.kwargs.get('name', None)
+
+    @property
+    def title(self):
+        """
+        Return the 'title' for this object.
+        The title is an optional description text.
+        If not present, default to the 'name' field.
+        """
+
+        return self.kwargs.get('title', self.name)
 
     @property
     def path(self):
@@ -177,14 +185,6 @@ class PidgenElement():
                     f=self.path
                 ))
                 # TODO - Use Levenstein distance for a "did-you-mean" message
-
-    @property
-    def verbosity(self):
-        """
-        Get the message 'verbosity' level.
-        By default, ERROR and WARNING messages are displayed.
-        """
-        return self.settings.get('verbosity', self._MSG_WARN)
 
     @property
     def level(self):

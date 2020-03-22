@@ -56,8 +56,7 @@ class PidgenStruct(PidgenElement):
                     self,
                     name=var,
                     data=var_data,
-                    path=self.path,
-                    settings=self.settings
+                    path=self.path
                 ))
 
             else:
@@ -65,6 +64,5 @@ class PidgenStruct(PidgenElement):
                     self,
                     name=var,
                     data=var_data,
-                    path=self.path,
-                    settings=self.settings
+                    path=self.path
                 ))

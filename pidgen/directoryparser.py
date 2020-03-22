@@ -69,9 +69,9 @@ class PidgenDirectoryParser(PidgenElement):
                 # TODO - Special files which augment the protocol generation
                 continue
 
-            self._files.append(PidgenFileParser(self, os.path.join(self.path, f), settings=self.settings))
+            self._files.append(PidgenFileParser(self, os.path.join(self.path, f)))
 
     def parseSubDirs(self, dirs):
         for d in dirs:
 
-            self._dirs.append(PidgenDirectoryParser(self, os.path.join(self.path, d), settings=self.settings))
+            self._dirs.append(PidgenDirectoryParser(self, os.path.join(self.path, d)))
