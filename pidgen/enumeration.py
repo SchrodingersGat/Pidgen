@@ -88,11 +88,12 @@ class PidgenEnumeration(PidgenElement):
             """
 
             if data is None:
+                # No value specified - use the current accumulated index
                 value = idx
 
             elif type(data) in [str, int]:
                 try:
-                    value = int(data)
+                    value = self.parseInt(data)
 
                     # Reset the iterator to this new value
                     idx = value
@@ -112,7 +113,7 @@ class PidgenEnumeration(PidgenElement):
                 if self.KEY_VALUE in data:
                     value = data[self.KEY_VALUE]
                     try:
-                        value = int(value)
+                        value = self.parseInt(value)
 
                         # Reset the iterator to this new value
                         idx = value
@@ -122,7 +123,7 @@ class PidgenEnumeration(PidgenElement):
                             e=self.name,
                             i=item,
                             v=value,
-                            f=self.file
+                            f=self.path
                         ))
 
                         value = idx

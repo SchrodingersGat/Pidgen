@@ -103,6 +103,23 @@ class PidgenElement():
 
         return a
 
+    @property
+    def tags(self):
+        """
+        Return a list of all top-level tags in this item.
+        Remove any 'meta' tags (e.g. line number)
+        """
+
+        tags = []
+
+        for k in self.data.keys():
+            # Ignore a 'meta-tag'
+            if k.startswith("_"):
+                continue
+            tags.append(k)
+
+        return tags
+
     def getDescendants(self, descendants=[]):
         """
         Return a flattened list of all descendants of this object (recursive)
@@ -167,7 +184,8 @@ class PidgenElement():
         """
 
         # Check that any required keys are provided
-        provided = [key.lower() for key in self.data]
+
+        provided = [str(key).lower() for key in self.tags]
         for key in self.required_keys:
             if key not in provided:
                 debug.error("Required key '{k}' missing from '{name}' in {f}".format(
@@ -205,7 +223,51 @@ class PidgenElement():
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
 
-    def checkBoolValue(self, value):
+    def parseInt(self, value):
+        """
+        Check if a value looks like an integer. 
+        
+        Formats supported:
+            integer - 123
+            string - '123'
+            bin - '0b1010'
+            hex - '0xA0'
+            oct - '0o75'
+        """
+
+        if type(value) is int:
+            return value
+        
+        value = str(value)
+
+        try:
+            return int(value)
+        except ValueError:
+            pass
+
+        if value.startswith('0b'):
+            try:
+                return int(value, 2)
+            except ValueError:
+                pass
+
+        if value.startswith('0o'):
+            try:
+                return int(value, 8)
+            except ValueError:
+                pass
+
+        if value.startswith('0x'):
+            try:
+                return int(value, 16)
+            except ValueError:
+                pass
+
+        debug.warning("Value {i} could not be converted to an integer - {f}".format(i=value, f=self.path))
+
+        raise ValueError
+
+    def parseBool(self, value):
         """
         Check if a value looks like a True or a False value
         """
@@ -228,6 +290,6 @@ class PidgenElement():
         """
 
         if key in self.data:
-            return self.checkBoolValue(self.data[key])
+            return self.parseBool(self.data[key])
         else:
             return False
