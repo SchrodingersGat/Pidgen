@@ -56,14 +56,31 @@ class PidgenElement():
         # Store a copy of the kwargs
         self.kwargs = kwargs
 
-        self.name = kwargs.get("name", "")
-        self.path = kwargs.get("path", "")
+        # Store the dataset associated with this object
         self.data = kwargs.get("data", {})
 
         # Store settings dict (default = empty dict)
         self.settings = kwargs.get("settings", {})
 
         self.validateKeys()
+
+    @property
+    def name(self):
+        """ Return the 'name' for this object """
+
+        return self.kwargs.get('name', None)
+
+    @property
+    def path(self):
+        """ Return the filepath for this object """
+
+        return self.kwargs.get('path', None)
+
+    @property
+    def comment(self):
+        """ Return the 'comment' for this object """
+
+        return self.kwargs.get('comment', None)
 
     @property
     def ancestors(self):
@@ -100,6 +117,31 @@ class PidgenElement():
 
         if child not in self.children:
             self.children.append(child)
+
+    def getSetting(self, key):
+        """
+        Return the value associated with the provided key (if it exists).
+        If the key is not found, request it from the parent object (and so-on).
+        In this manner, a top-down settings hierarchy is achieved.
+        """
+
+        if key in self.kwargs:
+            return self.kwargs[key]
+
+        elif self.parent is not None:
+            return self.parent.getSetting(key)
+
+        else:
+            return None
+
+    def setSettings(self, key, value):
+        """
+        Set the value of a local settings parameter.
+        This value is available to this object and also any children,
+        unless those children override the value.
+        """
+
+        self.kwargs[key] = value
 
     @property
     def required_keys(self):
