@@ -18,6 +18,7 @@ class PidgenDirectoryParser(PidgenElement):
 
     def __init__(self, parent, dirpath, **kwargs):
 
+        # Set the directory path
         kwargs["path"] = dirpath
 
         PidgenElement.__init__(self, parent, **kwargs)
