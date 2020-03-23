@@ -11,6 +11,8 @@
   <Value value='1234'/>
 </Enum>
 
-<Pocket name='lll'/>
+<Packet name='myTestPacket'>
+  <Data name='test' inMemoryType='unsigned8' comment="Test data"/>
+</Packet>
 
 </Protocol>

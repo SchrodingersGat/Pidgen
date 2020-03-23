@@ -10,7 +10,10 @@ Ref: https://stackoverflow.com/questions/6949395/is-there-a-way-to-get-a-line-nu
 """
 
 import xml.etree.ElementTree as ElementTree
-
+from . import debug
 
 def parseXML(filename):
-    return ElementTree.parse(filename)
+    try:
+        return ElementTree.parse(filename)
+    except ElementTree.ParseError as e:
+        debug.error("Error parsing XML file - '{f}' : {e}".format(f=filename, e=e), fail=True)
