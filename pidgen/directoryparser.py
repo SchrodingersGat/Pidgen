@@ -6,9 +6,11 @@ Directory parsing
 """
 
 import os
+import sys
 from .element import PidgenElement
 from .fileparser import PidgenFileParser
 from . import debug
+from .xmlparser import parseXML
 
 
 class PidgenDirectoryParser(PidgenElement):
@@ -31,11 +33,11 @@ class PidgenDirectoryParser(PidgenElement):
     def parse(self):
         """ Parse the current directory.
         - Look for any subdirectories
-        - Look for any protocol files (.yaml)
-        - Note: .yaml files prefixed with _ character are treated differently.
+        - Look for any protocol files (.xml)
+        - Note: .xml files prefixed with _ character are treated differently.
         """
 
-        debug.debug("Parsing directory:", self.path)
+        debug.info("Parsing directory:", self.path)
 
         listing = os.listdir(self.path)
 
@@ -48,8 +50,8 @@ class PidgenDirectoryParser(PidgenElement):
             if os.path.isdir(path):
                 dirs.append(item)
 
-            if os.path.isfile(path) and item.endswith(".yaml"):
-                files.append(item)
+            if os.path.isfile(path) and item.endswith(".xml"):
+                files.append(path)
 
         # Parse any files first
         self.parseFiles(files)
@@ -58,6 +60,9 @@ class PidgenDirectoryParser(PidgenElement):
         self.parseSubDirs(dirs)
 
     def parseFiles(self, files):
+        """
+        Parse list of .xml files discovered in the local directory.
+        """
 
         if len(files) == 0:
             debug.info("No protocol files found in directory '{d}'".format(d=self.path))
@@ -69,7 +74,23 @@ class PidgenDirectoryParser(PidgenElement):
                 # TODO - Special files which augment the protocol generation
                 continue
 
-            self._files.append(PidgenFileParser(self, os.path.join(self.path, f)))
+            # Read in the xml doc
+            doc = parseXML(f)
+            root = doc.getroot()
+
+            debug.info("Reading file: {f}".format(f=f))
+
+            if root.tag.lower() == 'protocol':
+                self._files.append(PidgenFileParser(
+                    self,
+                    xml=root,
+                    path=f
+                ))
+            else:
+                debug.warning("File {f} has root tag '{t}' - skipping.".format(
+                    f=f,
+                    t=root.tag
+                ))
 
     def parseSubDirs(self, dirs):
         for d in dirs:

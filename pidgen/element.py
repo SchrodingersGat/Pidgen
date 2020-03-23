@@ -8,6 +8,20 @@ import yaml
 from . import debug
 
 
+class PidgenLoader(yaml.loader.SafeLoader):
+    """
+    Custom yaml loader implementation.
+
+    - Includes line number information
+    """
+
+    def construct_mapping(self, node, deep=False):
+        mapping = super(PidgenLoader, self).construct_mapping(node, deep=deep)
+        # Add 1 so line numbering starts at 1
+        mapping['__line__'] = node.start_mark.line + 1
+        return mapping
+
+
 class PidgenElement():
     """
     Base level PidgenElement class.
@@ -43,11 +57,12 @@ class PidgenElement():
         args:
             parent - Parent object for this object. e.g. directory -> file -> packet -> struct -> data
 
-        required kwargs:
-            name - Local name of the element
-            path - Logical file path of the current element
-            data - Data structure (dictionary) loaded from source .yaml file
+        kwargs:
+            xml - Raw xml data associated with this object
+            path - Filepath of this object
         """
+
+        self.xml = kwargs.get("xml", None)
 
         self.children = []
 
@@ -59,16 +74,58 @@ class PidgenElement():
         # Store a copy of the kwargs
         self.kwargs = kwargs
 
-        # Store the dataset associated with this object
-        self.data = kwargs.get("data", {})
-
         self.validateKeys()
+
+        self._parse()
+
+    def _parse(self):
+        if self.xml is not None:
+            self.parse()
+
+    def keys(self):
+        """
+        Return a list of all top-level tags in this item.
+        Remove any 'meta' tags (e.g. line number)
+        """
+
+        if self.xml is None:
+            return []
+
+        return [k for k in self.xml.keys()]
+
+    def get(self, key, ret=None, ignore_case=True):
+        """
+        Return the value associated with the given key, in the XML data.
+
+        Args:
+            key - Name of the key
+
+        kwargs:
+            ret - Value to return if the key is not found
+            ignore_case - If true, key-lookup is not case sensitive (default = True)
+        """
+
+        if self.xml is None:
+            return ret
+
+        if ignore_case:
+            key = key.lower()
+
+            for k in self.keys():
+                if key == k.lower():
+                    return self.xml.get(k, ret)
+
+            # No matching key found?
+            return ret
+
+        else:
+            return self.xml.get(key, ret)
 
     @property
     def name(self):
         """ Return the 'name' for this object """
 
-        return self.kwargs.get('name', None)
+        return self.get("name", None)
 
     @property
     def title(self):
@@ -78,19 +135,25 @@ class PidgenElement():
         If not present, default to the 'name' field.
         """
 
-        return self.kwargs.get('title', self.name)
+        return self.get("title", self.name)
 
     @property
     def path(self):
         """ Return the filepath for this object """
 
-        return self.kwargs.get('path', None)
+        # If no path is specified for this object, maybe the parent?
+        p = self.kwargs.get('path', None)
+
+        if p is None and parent is not None:
+            return parent.path
+        else:
+            return p
 
     @property
     def comment(self):
         """ Return the 'comment' for this object """
 
-        return self.kwargs.get('comment', None)
+        return self.get('comment', None)
 
     @property
     def ancestors(self):
@@ -104,23 +167,6 @@ class PidgenElement():
             parent = parent.parent
 
         return a
-
-    @property
-    def tags(self):
-        """
-        Return a list of all top-level tags in this item.
-        Remove any 'meta' tags (e.g. line number)
-        """
-
-        tags = []
-
-        for k in self.data.keys():
-            # Ignore a 'meta-tag'
-            if k.startswith("_"):
-                continue
-            tags.append(k)
-
-        return tags
 
     def getDescendants(self, descendants=[]):
         """
@@ -187,7 +233,8 @@ class PidgenElement():
 
         # Check that any required keys are provided
 
-        provided = [str(key).lower() for key in self.tags]
+        provided = self.keys()
+        
         for key in self.required_keys:
             if key not in provided:
                 debug.error("Required key '{k}' missing from '{name}' in {f}".format(
@@ -197,13 +244,14 @@ class PidgenElement():
                 ))
 
         # Check for unknown keys
-        for el in self.data:
+        for el in provided:
             if el.lower() not in self.allowed_keys:
                 debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
                     k=el,
                     name=self.name,
                     f=self.path
                 ))
+
                 # TODO - Use Levenstein distance for a "did-you-mean" message
 
     @property
@@ -295,17 +343,3 @@ class PidgenElement():
             return self.parseBool(self.data[key])
         else:
             return False
-
-    def parseYaml(self, filename):
-        """
-        Parse an individual .yaml file
-        """
-
-        debug.debug("Parsing file:", filename)
-
-        with open(self.path, 'r') as yaml_file:
-            try:
-                self.data = yaml.safe_load(yaml_file)
-            except yaml.parser.ParserError as e:
-                debug.error("Error parsing file -", self.path)
-                debug.error(e, fail=True)

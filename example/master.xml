@@ -1,0 +1,26 @@
+<Protocol>
+
+<Enum
+  name='animals'
+  prefix='ANIMAL_'
+  >
+
+  <Value name='CAT' value='3'/>
+  <Value name='DOG' value='5' comment='This is a dog'/>
+  <Value name='PARROT' value='2'/>
+  <Value name='goanna'/>
+  <Value name='dragon' value='22'/>
+  <Value name='horse'/>
+  <Value name='monkey' value='10'/>
+  <Value name='whale' value='0x10'/>
+  <Value name='otter' value='0b101010'/>
+</Enum>
+
+<Enum name='cars'>
+  <Value name='toyota' value='2345x'/>
+  <Value name='mazda'/>
+</Enum>
+
+<Enu4m name='ads'/>
+
+</Protocol>
