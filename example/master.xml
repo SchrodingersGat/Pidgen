@@ -1,26 +1,16 @@
 <Protocol>
 
-<Enum
-  name='animals'
-  prefix='ANIMAL_'
-  >
+<Enum name="StatusCodes" prefix="STATUS_">
 
-  <Value name='CAT' value='3'/>
-  <Value name='DOG' value='5' comment='This is a dog'/>
-  <Value name='PARROT' value='2'/>
-  <Value name='goanna'/>
-  <Value name='dragon' value='22'/>
-  <Value name='horse'/>
-  <Value name='monkey' value='10'/>
-  <Value name='whale' value='0x10'/>
-  <Value name='otter' value='0b101010'/>
+  <Value name='OK' value='1'/>
+  <Value name="warning"/>
+  <Value name="ERROR"/>
+  <Value name="CRITICAL" value="0x10"/>
+
+  <Valpe name='test'/>
+  <Value value='1234'/>
 </Enum>
 
-<Enum name='cars'>
-  <Value name='toyota' value='2345x'/>
-  <Value name='mazda'/>
-</Enum>
-
-<Enu4m name='ads'/>
+<Pocket name='lll'/>
 
 </Protocol>

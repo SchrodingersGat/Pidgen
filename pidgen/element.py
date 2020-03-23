@@ -80,7 +80,20 @@ class PidgenElement():
 
     def _parse(self):
         if self.xml is not None:
+            debug.debug("Parsing", str(self))
             self.parse()
+
+    def parse(self):
+        """ Default implementation does nothing... """
+        pass
+
+    @property
+    def tag(self):
+        """ Return the base tag associated with this element """
+        if self.xml is None:
+            return ''
+        else:
+            return self.xml.tag
 
     def keys(self):
         """
@@ -155,8 +168,8 @@ class PidgenElement():
         # If no path is specified for this object, maybe the parent?
         p = self.kwargs.get('path', None)
 
-        if p is None and parent is not None:
-            return parent.path
+        if p is None and self.parent is not None:
+            return self.parent.path
         else:
             return p
 
@@ -248,22 +261,12 @@ class PidgenElement():
         
         for key in self.required_keys:
             if key not in provided:
-                debug.error("Required key '{k}' missing from '{name}' in {f}".format(
-                    k=key,
-                    name=self.name,
-                    f=self.path
-                ))
+                self.missingKey(key)
 
         # Check for unknown keys
         for el in provided:
             if el.lower() not in self.allowed_keys:
-                debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
-                    k=el,
-                    name=self.name,
-                    f=self.path
-                ))
-
-                # TODO - Use Levenstein distance for a "did-you-mean" message
+                self.unknownKey(el)
 
     @property
     def level(self):
@@ -354,3 +357,57 @@ class PidgenElement():
             return self.parseBool(self.data[key])
         else:
             return False
+
+    def missingKey(self, key, line=0):
+        """
+        Display an error about a missing key
+        """
+
+        error = "{f} - Missing key '{k}' in <{t}> '{n}'".format(
+            f=self.path,
+            k=key,
+            t=self.tag,
+            n=self.name)
+
+        if line > 0:
+            error += " (line {n})".format(n=line)
+
+        debug.error(error)
+
+    def unknownKey(self, key, line=0):
+        """
+        Display a warning about an unknown xml key
+        """
+
+        warning = "{f} - Unknown key '{k}' in <{t}> '{n}'".format(
+            f=self.path,
+            k=key,
+            t=self.tag,
+            n=self.name
+        )
+
+        if line > 0:
+            warning += " (line {n})".format(n=line)
+
+        debug.warning(warning)
+
+        # TODO - Use Levenstein distance for a "did-you-mean" message
+
+    def unknownElement(self, element, line=0):
+        """
+        Display a warning about an unknown element.
+        """
+
+        warning = "{f} - Unknown element '{e}' in <{t}> '{n}'".format(
+            f=self.path,
+            e=element,
+            t=self.tag,
+            n=self.name
+        )
+
+        if line > 0:
+            warning += " (line {n})".format(n=line)
+
+        debug.warning(warning)
+
+        # TODO - Use Levenstein distance for a "did-you-mean" message

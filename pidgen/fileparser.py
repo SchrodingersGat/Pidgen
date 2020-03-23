@@ -13,17 +13,18 @@ from . import debug
 
 
 class PidgenFileParser(PidgenElement):
-
-    KEY_PROTOCOL = 'protocol'
-    KEY_STRUCT = "struct"
+    """
+    Class for representing a single protocol file.
+    """
     
+    KEYS_STRUCT = ["structure", "struct"]
+
     KEYS_PACKET = ["packet", "pkt"]
     
     KEYS_ENUM = ["enumeration", "enum"]
 
     _VALID_KEYS = [
-        KEY_STRUCT
-    ] + KEYS_ENUM + KEYS_PACKET
+    ] + KEYS_STRUCT + KEYS_ENUM + KEYS_PACKET
 
     def __init__(self, parent, **kwargs):
 
@@ -46,17 +47,39 @@ class PidgenFileParser(PidgenElement):
             tag = child.tag.lower()
 
             if tag in self.KEYS_ENUM:
-                print("Enum:", child)
+
+                # Construct an Enumeration under this file
+                enum = PidgenEnumeration(self, xml=child)
 
             elif tag in self.KEYS_PACKET:
                 print("Packet:", child)
 
-            elif tag == self.KEY_STRUCT:
+            elif tag in self.KEYS_STRUCT:
                 print("Struct:", child)
 
             else:
-                # TODO - Make <line> number available here somehow...
-                debug.warning("{f} - Unknown element '{e}' at <line>".format(
-                    f=self.path,
-                    e=tag
-                ))
+                self.unknownElement(child.tag)
+
+    @property
+    def enumerations(self):
+        """
+        Return a list of enumerations which exist under this file.
+        """
+
+        return [c for c in self.children if isinstance(c, PidgenEnumeration)]
+
+    @property
+    def packets(self):
+        """
+        Return a list of packets which exist under this file.
+        """
+
+        return [c for c in self.children if isinstance(c, PidgenPacket)]
+
+    @property
+    def structs(self):
+        """
+        Return a list of structs which exist under this file
+        """
+
+        return [c for c in self.children if isinstance(c, PidgenStruct)]
