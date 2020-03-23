@@ -93,6 +93,17 @@ class PidgenElement():
 
         return [k for k in self.xml.keys()]
 
+    def isSet(self, key, default=False):
+        """
+        Test if the given key's value is "set" (in a boolean sense).
+
+        To be considered "set":
+        1) The key must be present
+        b) The associated value must "look" like a binary value
+        """
+
+        return self.parseBool(self.get(key, default))
+
     def get(self, key, ret=None, ignore_case=True):
         """
         Return the value associated with the given key, in the XML data.
