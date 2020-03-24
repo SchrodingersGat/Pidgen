@@ -95,9 +95,9 @@ class PidgenDirectoryParser(PidgenElement):
     @property
     def files(self):
         """ Return a list of protocol files under this directory """
-        return [c for c in self.children if isinstance(c, PidgenFileParser)]
+        return self.getChildren(PidgenFileParser)
 
     @property
     def dirs(self):
         """ Return a list of directories under this directory """
-        return [c for c in self.children if isinstance(c, PidgenDirectoryParser)]
+        return self.getChildren(PidgenDirectoryParser)

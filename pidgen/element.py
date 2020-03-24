@@ -71,6 +71,30 @@ class PidgenElement():
         """ Default implementation does nothing... """
         pass
 
+    def getChildren(self, pattern):
+        """
+        Return any children under this item which conform to the provided pattern.
+        Pattern can be:
+        
+        a) A class type
+        b) A list [] of potential class types
+        """
+
+        # Enforce list format so the following code is consistent
+        if type(pattern) not in [list, tuple]:
+            pattern = [pattern]
+
+        childs = []
+
+        for child in self.children:
+            
+            for p in pattern:
+                if isinstance(child, p):
+                    childs.append(child)
+                    break
+            
+        return childs
+
     @property
     def protocol(self):
         """

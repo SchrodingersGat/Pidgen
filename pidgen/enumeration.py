@@ -74,7 +74,7 @@ class PidgenEnumeration(PidgenElement):
     @property
     def values(self):
         """ Return all the values under this enumeration """
-        return [c for c in self.children if isinstance(c, PidgenEnumerationValue)]
+        return self.getChildren(PidgenEnumerationValue)
 
     def parse(self):
 

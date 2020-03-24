@@ -55,7 +55,7 @@ class PidgenFileParser(PidgenElement):
         Return a list of enumerations which exist under this file.
         """
 
-        return [c for c in self.children if isinstance(c, PidgenEnumeration)]
+        return self.getChildren(PidgenEnumeration)
 
     @property
     def packets(self):
@@ -63,12 +63,12 @@ class PidgenFileParser(PidgenElement):
         Return a list of packets which exist under this file.
         """
 
-        return [c for c in self.children if isinstance(c, PidgenPacket)]
-
+        return self.getChildren(PidgenPacket)
+        
     @property
     def structs(self):
         """
         Return a list of structs which exist under this file
         """
 
-        return [c for c in self.children if isinstance(c, PidgenStruct)]
+        return self.getChildren(PidgenStruct)
