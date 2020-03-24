@@ -57,6 +57,7 @@ class PidgenEnumeration(PidgenElement):
     ALLOWED_KEYS = [
         "prefix",
         "suffix",
+        "private",
     ]
 
     REQUIRED_KEYS = [
@@ -75,6 +76,10 @@ class PidgenEnumeration(PidgenElement):
     def values(self):
         """ Return all the values under this enumeration """
         return self.getChildren(PidgenEnumerationValue)
+
+    def isPrivate(self):
+        """ Return True if this enumeration is "private" (cannot be seen from other files) """
+        return self.isSet("private")
 
     def parse(self):
 
