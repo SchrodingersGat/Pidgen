@@ -15,11 +15,15 @@ class PidgenDataElement(PidgenElement):
         units - Natural units of the represented data
     """
 
-    _VALID_KEYS = [
-        "datatype", "inMemoryType",  # Synonymous
-        "encoding", "encodedType",  # Synonymous
+    ALLOWED_KEYS = [
+        "datatype", "inmemorytype",  # Synonymous
+        "encoding", "encodedtype",  # Synonymous
         "units",
         "default",
+    ]
+
+    REQUIRED_KEYS = [
+        "name",
     ]
 
     # Allowable datatypes

@@ -15,17 +15,13 @@ class PidgenFileParser(PidgenElement):
     Class for representing a single protocol file.
     """
 
-    _VALID_KEYS = [
+    ALLOWED_CHILDREN = [
         "pkt", "packet",  # Synonymous
         "struct", "structure",  # Synonymous
         "enum", "enumeration",  # Synonymous
     ]
 
     def __init__(self, parent, **kwargs):
-
-        self.enums = []
-        self.packets = []
-        self.structs = []
         
         PidgenElement.__init__(self, parent, **kwargs)
 
@@ -52,9 +48,6 @@ class PidgenFileParser(PidgenElement):
             elif tag in ["struct", "structure"]:
                 # Construct a struct under this file
                 PidgenStruct(self, xml=child)
-
-            else:
-                self.unknownElement(child.tag)
 
     @property
     def enumerations(self):

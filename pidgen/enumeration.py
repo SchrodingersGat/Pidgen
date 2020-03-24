@@ -9,11 +9,12 @@ class PidgenEnumerationValue(PidgenElement):
     Single element in an enumeration struct
     """
 
-    _VALID_KEYS = [
-        "value"
+    ALLOWED_KEYS = [
+        "value",
+        "title",
     ]
 
-    _REQUIRED_KEYS = [
+    REQUIRED_KEYS = [
         "name"
     ]
 
@@ -21,14 +22,17 @@ class PidgenEnumerationValue(PidgenElement):
 
         PidgenElement.__init__(self, parent, **kwargs)
 
-    def value_raw(self):
-        """ Return the 'raw' value provided by this enumeration """
-        return self.get('value', None)
+    @property
+    def prefix(self):
+        if isinstance(self.parent, PidgenEnumeration):
+            return self.parent.prefix
+        return ""
 
-    def value_str(self):
-        """ Return the computed value. """
-
-        return ''
+    @property
+    def enum_title(self):
+        """ Render the complete enum title of this element """
+        t = self.prefix + self.name
+        return t.upper()
 
 
 class PidgenEnumeration(PidgenElement):
@@ -36,12 +40,16 @@ class PidgenEnumeration(PidgenElement):
     The PidgenEnumeration class provides support for integer enumerations.
     """
 
-    _VALID_KEYS = [
+    ALLOWED_KEYS = [
         "prefix",
     ]
 
-    _REQUIRED_KEYS = [
+    REQUIRED_KEYS = [
         "name",
+    ]
+
+    ALLOWED_CHILDREN = [
+        "value"
     ]
 
     def __init__(self, parent, **kwargs):
@@ -63,9 +71,6 @@ class PidgenEnumeration(PidgenElement):
 
                 # Create a new enumeration value
                 PidgenEnumerationValue(self, xml=child)
-
-            else:
-                self.unknownElement(tag)
 
     def calculate(self):
         """

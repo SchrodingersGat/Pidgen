@@ -14,8 +14,15 @@ class PidgenStruct(PidgenElement):
         data - Array of data contained within this struct
     """
 
-    _REQUIRED_KEYS = [
+    ALLOWED_KEYS = [
+    ]
+
+    REQUIRED_KEYS = [
         "name"
+    ]
+
+    ALLOWED_CHILDREN = [
+        "data"
     ]
 
     def __init__(self, parent, **kwargs):
@@ -38,7 +45,3 @@ class PidgenStruct(PidgenElement):
                 # Create a new sub-struct
                 # TODO - What does it mean to have a struct inside a struct?
                 PidgenStruct(self, xml=child)
-
-            else:
-                # Unknown tag
-                self.unknownElement(child.tag())

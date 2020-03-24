@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import os
+from rapidfuzz import fuzz
 
 from . import debug
 
@@ -14,25 +15,18 @@ class PidgenElement():
     
     """
 
-    # Keys which are allowed for any element
-    _BASIC_KEYS = [
+    BASIC_KEYS = [
         "name",
         "title",
         "comment",
     ]
-
-    # Default implementation of _VALID_KEYS is empty
-    _VALID_KEYS = []
-
-    # Default implementation of _REQUIRED_KEYS is empty
-    _REQUIRED_KEYS = []
 
     # Options for specifying a "true" value
     _TRUE = ["y", "yes", "1", "true", "on"]
     _FALSE = ["n", "no", "0", "false", "off"]
 
     def __repr__(self):
-        return "'{name}' <{t}> - {f}".format(name=self.name, t=self.__class__, f=self.path)
+        return "'{name}' {t} - {f}".format(name=self.name, t=self.__class__, f=self.path)
 
     def __init__(self, parent, **kwargs):
         """
@@ -59,6 +53,7 @@ class PidgenElement():
         self.kwargs = kwargs
 
         self.validateKeys()
+        self.validateChildren()
 
         self._parse()
 
@@ -227,12 +222,42 @@ class PidgenElement():
     @property
     def required_keys(self):
         """ Return a list of keys required for this element """
-        return self._REQUIRED_KEYS
+
+        if hasattr(self, "REQUIRED_KEYS"):
+            return set(self.REQUIRED_KEYS)
+        else:
+            return set()
 
     @property
     def allowed_keys(self):
         """ Return a list of keys allowed for this element """
-        return self._BASIC_KEYS + self._VALID_KEYS
+
+        # These keys are "allowed" for any element
+        allowed = set(self.BASIC_KEYS)
+
+        if hasattr(self, "ALLOWED_KEYS"):
+            for k in self.ALLOWED_KEYS:
+                allowed.add(k)
+        
+        return allowed
+
+    @property
+    def required_children(self):
+        """ Return a list of child elements required for this element """
+
+        if hasattr(self, "REQUIRED_CHILDREN"):
+            return set(self.REQUIRED_CHILDREN)
+        else:
+            return set()
+
+    @property
+    def allowed_children(self):
+        """ Return a list of child elements allowed for this element """
+
+        if hasattr(self, "ALLOWED_CHILDREN"):
+            return set(self.ALLOWED_CHILDREN)
+        else:
+            return set()
 
     def validateKeys(self):
         """
@@ -251,6 +276,21 @@ class PidgenElement():
         for el in provided:
             if el.lower() not in self.allowed_keys:
                 self.unknownKey(el)
+
+    def validateChildren(self):
+        """
+        Ensure that the child structures provided under this element are valid.
+        """
+
+        if self.xml is None:
+            return
+
+        for child in self.xml.getchildren():
+
+            tag = child.tag.lower()
+
+            if tag not in self.allowed_children:
+                self.unknownChild(child.tag)
 
     @property
     def level(self):
@@ -389,16 +429,35 @@ class PidgenElement():
         if line > 0:
             warning += " (line {n})".format(n=line)
 
+        allowed = self.allowed_keys
+
+        if len(allowed) > 0:
+            warning += " (Allowed elements = '" + ", ".join([k for k in allowed]) + "')"
+
         debug.warning(warning)
 
-        # TODO - Use Levenstein distance for a "did-you-mean" message
+        # Use Levenstein distance for a "did-you-mean" message
+        best_match = None
+        best_score = 0
 
-    def unknownElement(self, element, line=0):
+        for k in allowed:
+            score = fuzz.partial_ratio(key, k)
+
+            if score > best_score:
+                best_score = score
+                best_match = k
+
+        if best_match is not None and best_score > 50:
+            did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=key, match=best_match)
+
+            debug.info(did_you_mean)
+
+    def unknownChild(self, element, line=0):
         """
-        Display a warning about an unknown element.
+        Display a warning about an unknown child element.
         """
 
-        warning = "{f} - Unknown element '{e}' in <{t}> '{n}'".format(
+        warning = "{f} - Unknown child element '{e}' in <{t}> '{n}'".format(
             f=self.path,
             e=element,
             t=self.tag,
@@ -408,6 +467,25 @@ class PidgenElement():
         if line > 0:
             warning += " (line {n})".format(n=line)
 
+        allowed = self.allowed_children
+
+        if len(allowed) > 0:
+            warning += " (Allowed elements = '" + ", ".join([k for k in allowed]) + "')"
+        
         debug.warning(warning)
 
-        # TODO - Use Levenstein distance for a "did-you-mean" message
+        # Use Levenstein distance for a "did-you-mean" message
+        best_match = None
+        best_score = 0
+
+        for key in allowed:
+            score = fuzz.partial_ratio(element, key)
+
+            if score > best_score:
+                best_score = score
+                best_match = key
+
+        if best_match is not None and best_score > 50:
+            did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=element, match=best_match)
+
+            debug.warning(did_you_mean)
