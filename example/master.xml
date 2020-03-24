@@ -1,13 +1,13 @@
 <Protocol>
 
-<Enum name="StatusCodes" prefix="STATUS_">
+<Enum name="StatusCodes" prefix="STATUS_" suffix="_VALUES">
 
   <Value name='OK' value='1'/>
   <Value name="warning"/>
   <Value name="ERROR"/>
-  <Value name="CRITICAL" value="0x10"/>
+  <Value name="CRITICAL" value="0x10" ignoreSUffix="true"/>
 
-  <Valpe name='test'/>
+  <Value name='test' ignorePrefix="true"/>
   <Value name='chicken' value='1234'/>
 </Enum>
 

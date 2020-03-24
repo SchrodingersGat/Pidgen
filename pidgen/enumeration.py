@@ -12,6 +12,8 @@ class PidgenEnumerationValue(PidgenElement):
     ALLOWED_KEYS = [
         "value",
         "title",
+        "ignoreprefix",
+        "ignoresuffix",
     ]
 
     REQUIRED_KEYS = [
@@ -24,15 +26,21 @@ class PidgenEnumerationValue(PidgenElement):
 
     @property
     def prefix(self):
-        if isinstance(self.parent, PidgenEnumeration):
+        if self.isSet("ignoreprefix"):
+            return ""
+        elif isinstance(self.parent, PidgenEnumeration):
             return self.parent.prefix
-        return ""
+        else:
+            return ""
 
     @property
     def suffix(self):
-        if isinstance(self.parent, PidgenEnumeration):
+        if self.isSet("ignoresuffix"):
+            return ""
+        elif isinstance(self.parent, PidgenEnumeration):
             return self.parent.suffix
-        return ""
+        else:
+            return ""
 
     @property
     def enum_title(self):
