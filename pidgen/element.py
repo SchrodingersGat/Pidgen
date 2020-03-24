@@ -72,6 +72,19 @@ class PidgenElement():
         pass
 
     @property
+    def protocol(self):
+        """
+        The "Protocol" object is the top-level directory parser.
+        So, go obtain the "Protocol" object, simply traverse upwards,
+        until there are no higher parent objects.
+        """
+
+        if self.parent is None:
+            return self
+        else:
+            return self.parent.protocol
+
+    @property
     def lineNumber(self):
         """ Return the line number of the XML element which defines this object """
 
