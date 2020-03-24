@@ -79,6 +79,11 @@ class PidgenElement():
             item_type - Can be either a class type or a string which matches a class
             item_name - Name of the item to look for (case-insensitive)
             global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
+
+        Return:
+            Matching item, if one (and only one) match was found.
+            - If no matches are found, issue a warning and return None
+            - If multiple matches are found, issue an error and return None
         """
 
         if global_search:
