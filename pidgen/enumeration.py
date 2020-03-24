@@ -29,9 +29,15 @@ class PidgenEnumerationValue(PidgenElement):
         return ""
 
     @property
+    def suffix(self):
+        if isinstance(self.parent, PidgenEnumeration):
+            return self.parent.suffix
+        return ""
+
+    @property
     def enum_title(self):
         """ Render the complete enum title of this element """
-        t = self.prefix + self.name
+        t = self.prefix + self.name + self.suffix
         return t.upper()
 
 
@@ -42,6 +48,7 @@ class PidgenEnumeration(PidgenElement):
 
     ALLOWED_KEYS = [
         "prefix",
+        "suffix",
     ]
 
     REQUIRED_KEYS = [
@@ -147,6 +154,11 @@ class PidgenEnumeration(PidgenElement):
     def prefix(self):
         """ Return the prefix for this enumeration """
         return self.get("prefix", "")
+
+    @property
+    def suffix(self):
+        """ Return the suffix for this enumeration """
+        return self.get("suffix", "")
 
     def renderKey(self, key, capitalize=True):
         """ Render a key for this enumeration """
