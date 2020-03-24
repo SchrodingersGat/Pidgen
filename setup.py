@@ -31,7 +31,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     
     classifiers=[
-        "Programming Language :: Python :: 2/3",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
@@ -42,5 +42,5 @@ setuptools.setup(
         'flake8'
     ],
 
-    python_requires=">=2.7"
+    python_requires=">=3.5"
 )
