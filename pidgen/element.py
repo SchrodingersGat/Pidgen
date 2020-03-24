@@ -26,7 +26,12 @@ class PidgenElement():
     _FALSE = ["n", "no", "0", "false", "off"]
 
     def __repr__(self):
-        return "<{tag}>:{name} {t} - {f}".format(tag=self.tag, name=self.name, t=self.__class__, f=self.path)
+        return "<{tag}>:{name} - {f}:{line}".format(
+            tag=self.tag,
+            name=self.name,
+            f=self.path,
+            line=self.lineNumber
+        )
 
     def __init__(self, parent, **kwargs):
         """
@@ -65,6 +70,15 @@ class PidgenElement():
     def parse(self):
         """ Default implementation does nothing... """
         pass
+
+    @property
+    def lineNumber(self):
+        """ Return the line number of the XML element which defines this object """
+
+        try:
+            return self.xml._start_line_number
+        except AttributeError:
+            return 0
 
     @property
     def tag(self):
@@ -238,6 +252,10 @@ class PidgenElement():
         if hasattr(self, "ALLOWED_KEYS"):
             for k in self.ALLOWED_KEYS:
                 allowed.add(k)
+
+        # Required keys are also 'allowed'
+        for k in self.required_keys:
+            allowed.add(k)
         
         return allowed
 
@@ -290,7 +308,7 @@ class PidgenElement():
             tag = child.tag.lower()
 
             if tag not in self.allowed_children:
-                self.unknownChild(child.tag)
+                self.unknownChild(child.tag, line=child._start_line_number)
 
     @property
     def level(self):
@@ -398,19 +416,17 @@ class PidgenElement():
         else:
             return False
 
-    def missingKey(self, key, line=0):
+    def missingKey(self, key):
         """
         Display an error about a missing key
         """
 
-        error = "{f} - Missing key '{k}' in <{t}> '{n}'".format(
+        error = "{f}{line} - Missing key '{k}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=self.lineNumber) if self.lineNumber > 0 else "",
             k=key,
             t=self.tag,
             n=self.name)
-
-        if line > 0:
-            error += " (line {n})".format(n=line)
 
         debug.error(error)
 
@@ -419,8 +435,9 @@ class PidgenElement():
         Display a warning about an unknown xml key
         """
 
-        warning = "{f} - Unknown key '{k}' in <{t}> '{n}'".format(
+        warning = "{f}{line} - Unknown key '{k}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=self.lineNumber) if self.lineNumber > 0 else "",
             k=key,
             t=self.tag,
             n=self.name
@@ -457,15 +474,13 @@ class PidgenElement():
         Display a warning about an unknown child element.
         """
 
-        warning = "{f} - Unknown child element '{e}' in <{t}> '{n}'".format(
+        warning = "{f}{line} - Unknown child element '{e}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=line) if line > 0 else "",
             e=element,
             t=self.tag,
             n=self.name
         )
-
-        if line > 0:
-            warning += " (line {n})".format(n=line)
 
         allowed = self.allowed_children
 
