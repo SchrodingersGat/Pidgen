@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .element import PidgenElement
-from .data import PidgenData
-from . import debug
+from .data import PidgenDataElement
 
 
 class PidgenStruct(PidgenElement):
@@ -15,56 +14,34 @@ class PidgenStruct(PidgenElement):
         data - Array of data contained within this struct
     """
 
-    KEY_DATA = "data"
+    ALLOWED_KEYS = [
+    ]
 
-    _VALID_KEYS = [
-        KEY_DATA,
+    REQUIRED_KEYS = [
+        "name"
+    ]
+
+    ALLOWED_CHILDREN = [
+        "data"
     ]
 
     def __init__(self, parent, **kwargs):
 
         PidgenElement.__init__(self, parent, **kwargs)
 
-        # List of variables which exist in this struct
-        self.variables = []
-        
-        self.parse()
-
     def parse(self):
-        debug.debug("Parsing struct:", self.name)
 
-        self.parse_data()
+        for child in self.xml.getchildren():
 
-    def parse_data(self):
-        """
-        Parse the variables provided under the 'data' tag.
-        """
+            tag = child.tag.lower()
 
-        if self.KEY_DATA not in self.data:
-            debug.warning("Empty struct '{s}'".format(s=self.name), self.path)
-            return
+            if tag == "data":
 
-        variables = self.data[self.KEY_DATA]
+                # Create a new data value
+                PidgenDataElement(self, xml=child)
+            
+            elif tag in ["struct", "structure"]:
 
-        for var in variables:
-
-            var_data = variables[var]
-
-            # Is the variable a 'struct'?
-            if PidgenData.KEY_STRUCT in var:
-                self.variables.append(PidgenStruct(
-                    self,
-                    name=var,
-                    data=var_data,
-                    path=self.path,
-                    settings=self.settings
-                ))
-
-            else:
-                self.variables.append(PidgenData(
-                    self,
-                    name=var,
-                    data=var_data,
-                    path=self.path,
-                    settings=self.settings
-                ))
+                # Create a new sub-struct
+                # TODO - What does it mean to have a struct inside a struct?
+                PidgenStruct(self, xml=child)

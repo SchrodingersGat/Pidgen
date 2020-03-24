@@ -1,3 +1,4 @@
-pyyaml               # YAML parsing
-colorama             # Pretty text printing
-flake8               # PEP checking
+pyyaml          # YAML parsing
+colorama        # Pretty text printing
+flake8          # PEP checking
+rapidfuzz       # Partial string matching     

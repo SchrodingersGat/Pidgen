@@ -4,96 +4,71 @@
 File parsing
 """
 
-import yaml
-
 from .element import PidgenElement
 from .struct import PidgenStruct
 from .packet import PidgenPacket
 from .enumeration import PidgenEnumeration
 
-from . import debug
-
 
 class PidgenFileParser(PidgenElement):
+    """
+    Class for representing a single protocol file.
+    """
 
-    KEY_STRUCTS = "structs"
-    KEY_PACKETS = "packets"
-    KEY_ENUMS = "enumerations"
-
-    _VALID_KEYS = [
-        KEY_STRUCTS,
-        KEY_PACKETS,
-        KEY_ENUMS
+    ALLOWED_CHILDREN = [
+        "pkt", "packet",  # Synonymous
+        "struct", "structure",  # Synonymous
+        "enum", "enumeration",  # Synonymous
     ]
 
-    def __init__(self, parent, filepath, **kwargs):
-
-        # Override the path argument
-        kwargs["path"] = filepath
-
+    def __init__(self, parent, **kwargs):
+        
         PidgenElement.__init__(self, parent, **kwargs)
-
-        self.enums = []
-        self.packets = []
-        self.structs = []
-
-        self.parse()
 
     def parse(self):
         """
         Parse an individual protocol file.
+        The root-node has been checked by the directory parser, so we know this file is valid.
         """
 
-        debug.debug("Parsing file:", self.path)
+        children = self.xml.getchildren()
 
-        with open(self.path, 'r') as yaml_file:
-            try:
-                self.data = yaml.safe_load(yaml_file)
-            except yaml.parser.ParserError as e:
-                debug.error("Error parsing file -", self.path)
-                debug.error(e, fail=True)
+        for child in children:
+            # Iterate through each top-level structure in the XML file
+            tag = child.tag.lower()
 
-        self.parseStructs()
-        self.parsePackets()
-        self.parseEnums()
+            if tag in ["enum", "enumeration"]:
+                # Construct an Enumeration under this file
+                PidgenEnumeration(self, xml=child)
 
-    def parseStructs(self):
+            elif tag in ["pkt", "packet"]:
+                # Construct a Packet under this file
+                PidgenPacket(self, xml=child)
 
-        structs = self.data.get(self.KEY_STRUCTS, {})
+            elif tag in ["struct", "structure"]:
+                # Construct a struct under this file
+                PidgenStruct(self, xml=child)
 
-        for struct in structs:
-            
-            self.structs.append(PidgenStruct(
-                name=struct,
-                data=structs[struct],
-                path=self.path,
-                settings=self.settings
-            ))
+    @property
+    def enumerations(self):
+        """
+        Return a list of enumerations which exist under this file.
+        """
 
-    def parsePackets(self):
-        
-        packets = self.data.get(self.KEY_PACKETS, {})
+        return [c for c in self.children if isinstance(c, PidgenEnumeration)]
 
-        for packet in packets:
+    @property
+    def packets(self):
+        """
+        Return a list of packets which exist under this file.
+        """
 
-            self.packets.append(PidgenPacket(
-                self,
-                name=packet,
-                data=packets[packet],
-                path=self.path,
-                settings=self.settings
-            ))
+        return [c for c in self.children if isinstance(c, PidgenPacket)]
 
-    def parseEnums(self):
+    @property
+    def structs(self):
+        """
+        Return a list of structs which exist under this file
+        """
 
-        enums = self.data.get(self.KEY_ENUMS, {})
-
-        for enum in enums:
-
-            self.enums.append(PidgenEnumeration(
-                self,
-                name=enum,
-                data=enums[enum],
-                path=self.path,
-                settings=self.settings
-            ))
+        return [c for c in self.children if isinstance(c, PidgenStruct)]

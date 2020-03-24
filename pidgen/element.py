@@ -3,6 +3,8 @@
 from __future__ import print_function
 
 import os
+from rapidfuzz import fuzz
+
 from . import debug
 
 
@@ -13,24 +15,18 @@ class PidgenElement():
     
     """
 
-    # Generic keys we can expect for most element types
-    KEY_NAME = "name"
-    KEY_COMMENT = "comment"
-
-    _BASIC_KEYS = [
-        KEY_NAME,
-        KEY_COMMENT
+    BASIC_KEYS = [
+        "name",
+        "title",
+        "comment",
     ]
-
-    # Default implementation of _VALID_KEYS is empty
-    _VALID_KEYS = []
-
-    # Default implementation of _REQUIRED_KEYS is empty
-    _REQUIRED_KEYS = []
 
     # Options for specifying a "true" value
     _TRUE = ["y", "yes", "1", "true", "on"]
     _FALSE = ["n", "no", "0", "false", "off"]
+
+    def __repr__(self):
+        return "'{name}' {t} - {f}".format(name=self.name, t=self.__class__, f=self.path)
 
     def __init__(self, parent, **kwargs):
         """
@@ -40,11 +36,11 @@ class PidgenElement():
             parent - Parent object for this object. e.g. directory -> file -> packet -> struct -> data
 
         kwargs:
-            name - Local name of the element
-            path - Logical file path of the current element
-            data - Data structure (dictionary) loaded from source .yaml file
-            verbosity - Verbosity level of debug output
+            xml - Raw xml data associated with this object
+            path - Filepath of this object
         """
+
+        self.xml = kwargs.get("xml", None)
 
         self.children = []
 
@@ -56,31 +52,111 @@ class PidgenElement():
         # Store a copy of the kwargs
         self.kwargs = kwargs
 
-        # Store the dataset associated with this object
-        self.data = kwargs.get("data", {})
-
-        # Store settings dict (default = empty dict)
-        self.settings = kwargs.get("settings", {})
-
         self.validateKeys()
+        self.validateChildren()
+
+        self._parse()
+
+    def _parse(self):
+        if self.xml is not None:
+            debug.debug("Parsing", str(self))
+            self.parse()
+
+    def parse(self):
+        """ Default implementation does nothing... """
+        pass
+
+    @property
+    def tag(self):
+        """ Return the base tag associated with this element """
+        if self.xml is None:
+            return ''
+        else:
+            return self.xml.tag
+
+    def keys(self):
+        """
+        Return a list of all top-level tags in this item.
+        Remove any 'meta' tags (e.g. line number)
+        """
+
+        if self.xml is None:
+            return []
+
+        return [k for k in self.xml.keys()]
+
+    def isSet(self, key, default=False):
+        """
+        Test if the given key's value is "set" (in a boolean sense).
+
+        To be considered "set":
+        1) The key must be present
+        b) The associated value must "look" like a binary value
+        """
+
+        return self.parseBool(self.get(key, default))
+
+    def get(self, key, ret=None, ignore_case=True):
+        """
+        Return the value associated with the given key, in the XML data.
+
+        Args:
+            key - Name of the key
+
+        kwargs:
+            ret - Value to return if the key is not found
+            ignore_case - If true, key-lookup is not case sensitive (default = True)
+        """
+
+        if self.xml is None:
+            return ret
+
+        if ignore_case:
+            key = key.lower()
+
+            for k in self.keys():
+                if key == k.lower():
+                    return self.xml.get(k, ret)
+
+            # No matching key found?
+            return ret
+
+        else:
+            return self.xml.get(key, ret)
 
     @property
     def name(self):
         """ Return the 'name' for this object """
 
-        return self.kwargs.get('name', None)
+        return self.get("name", None)
+
+    @property
+    def title(self):
+        """
+        Return the 'title' for this object.
+        The title is an optional description text.
+        If not present, default to the 'name' field.
+        """
+
+        return self.get("title", self.name)
 
     @property
     def path(self):
         """ Return the filepath for this object """
 
-        return self.kwargs.get('path', None)
+        # If no path is specified for this object, maybe the parent?
+        p = self.kwargs.get('path', None)
+
+        if p is None and self.parent is not None:
+            return self.parent.path
+        else:
+            return p
 
     @property
     def comment(self):
         """ Return the 'comment' for this object """
 
-        return self.kwargs.get('comment', None)
+        return self.get('comment', None)
 
     @property
     def ancestors(self):
@@ -146,12 +222,42 @@ class PidgenElement():
     @property
     def required_keys(self):
         """ Return a list of keys required for this element """
-        return self._REQUIRED_KEYS
+
+        if hasattr(self, "REQUIRED_KEYS"):
+            return set(self.REQUIRED_KEYS)
+        else:
+            return set()
 
     @property
     def allowed_keys(self):
         """ Return a list of keys allowed for this element """
-        return self._BASIC_KEYS + self._VALID_KEYS
+
+        # These keys are "allowed" for any element
+        allowed = set(self.BASIC_KEYS)
+
+        if hasattr(self, "ALLOWED_KEYS"):
+            for k in self.ALLOWED_KEYS:
+                allowed.add(k)
+        
+        return allowed
+
+    @property
+    def required_children(self):
+        """ Return a list of child elements required for this element """
+
+        if hasattr(self, "REQUIRED_CHILDREN"):
+            return set(self.REQUIRED_CHILDREN)
+        else:
+            return set()
+
+    @property
+    def allowed_children(self):
+        """ Return a list of child elements allowed for this element """
+
+        if hasattr(self, "ALLOWED_CHILDREN"):
+            return set(self.ALLOWED_CHILDREN)
+        else:
+            return set()
 
     def validateKeys(self):
         """
@@ -159,32 +265,32 @@ class PidgenElement():
         """
 
         # Check that any required keys are provided
-        provided = [key.lower() for key in self.data]
+
+        provided = self.keys()
+        
         for key in self.required_keys:
             if key not in provided:
-                debug.error("Required key '{k}' missing from '{name}' in {f}".format(
-                    k=key,
-                    name=self.name,
-                    f=self.path
-                ))
+                self.missingKey(key)
 
         # Check for unknown keys
-        for el in self.data:
+        for el in provided:
             if el.lower() not in self.allowed_keys:
-                debug.warning("Unknown key '{k}' found in '{name}' - {f}".format(
-                    k=el,
-                    name=self.name,
-                    f=self.path
-                ))
-                # TODO - Use Levenstein distance for a "did-you-mean" message
+                self.unknownKey(el)
 
-    @property
-    def verbosity(self):
+    def validateChildren(self):
         """
-        Get the message 'verbosity' level.
-        By default, ERROR and WARNING messages are displayed.
+        Ensure that the child structures provided under this element are valid.
         """
-        return self.settings.get('verbosity', self._MSG_WARN)
+
+        if self.xml is None:
+            return
+
+        for child in self.xml.getchildren():
+
+            tag = child.tag.lower()
+
+            if tag not in self.allowed_children:
+                self.unknownChild(child.tag)
 
     @property
     def level(self):
@@ -205,7 +311,67 @@ class PidgenElement():
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
 
-    def checkBoolValue(self, value):
+    def parseFloat(self, value):
+        """
+        Check if a value looks like a floating point
+        """
+
+        if type(value) in [int, float]:
+            return value
+
+        value = str(value)
+
+        try:
+            return float(value)
+        except ValueError:
+            debug.warning("Value {i} could not be converted to an float - {f}".format(i=value, f=self.path))
+            raise ValueError
+
+    def parseInt(self, value):
+        """
+        Check if a value looks like an integer.
+        
+        Formats supported:
+            integer - 123
+            string - '123'
+            bin - '0b1010'
+            hex - '0xA0'
+            oct - '0o75'
+        """
+
+        if type(value) is int:
+            return value
+        
+        value = str(value)
+
+        try:
+            return int(value)
+        except ValueError:
+            pass
+
+        if value.startswith('0b'):
+            try:
+                return int(value, 2)
+            except ValueError:
+                pass
+
+        if value.startswith('0o'):
+            try:
+                return int(value, 8)
+            except ValueError:
+                pass
+
+        if value.startswith('0x'):
+            try:
+                return int(value, 16)
+            except ValueError:
+                pass
+
+        debug.warning("Value {i} could not be converted to an integer - {f}".format(i=value, f=self.path))
+
+        raise ValueError
+
+    def parseBool(self, value):
         """
         Check if a value looks like a True or a False value
         """
@@ -228,6 +394,98 @@ class PidgenElement():
         """
 
         if key in self.data:
-            return self.checkBoolValue(self.data[key])
+            return self.parseBool(self.data[key])
         else:
             return False
+
+    def missingKey(self, key, line=0):
+        """
+        Display an error about a missing key
+        """
+
+        error = "{f} - Missing key '{k}' in <{t}> '{n}'".format(
+            f=self.path,
+            k=key,
+            t=self.tag,
+            n=self.name)
+
+        if line > 0:
+            error += " (line {n})".format(n=line)
+
+        debug.error(error)
+
+    def unknownKey(self, key, line=0):
+        """
+        Display a warning about an unknown xml key
+        """
+
+        warning = "{f} - Unknown key '{k}' in <{t}> '{n}'".format(
+            f=self.path,
+            k=key,
+            t=self.tag,
+            n=self.name
+        )
+
+        if line > 0:
+            warning += " (line {n})".format(n=line)
+
+        allowed = self.allowed_keys
+
+        if len(allowed) > 0:
+            warning += " (Allowed elements = '" + ", ".join([k for k in allowed]) + "')"
+
+        debug.warning(warning)
+
+        # Use Levenstein distance for a "did-you-mean" message
+        best_match = None
+        best_score = 0
+
+        for k in allowed:
+            score = fuzz.partial_ratio(key.lower(), k)
+
+            if score > best_score:
+                best_score = score
+                best_match = k
+
+        if best_match is not None and best_score > 65:
+            did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=key, match=best_match)
+
+            debug.info(did_you_mean)
+
+    def unknownChild(self, element, line=0):
+        """
+        Display a warning about an unknown child element.
+        """
+
+        warning = "{f} - Unknown child element '{e}' in <{t}> '{n}'".format(
+            f=self.path,
+            e=element,
+            t=self.tag,
+            n=self.name
+        )
+
+        if line > 0:
+            warning += " (line {n})".format(n=line)
+
+        allowed = self.allowed_children
+
+        if len(allowed) > 0:
+            warning += " (Allowed elements = '" + ", ".join([k for k in allowed]) + "')"
+        
+        debug.warning(warning)
+
+        # Use Levenstein distance for a "did-you-mean" message
+        best_match = None
+        best_score = 0
+
+        for key in allowed:
+            score = fuzz.partial_ratio(element.lower(), key)
+
+            if score > best_score:
+                best_score = score
+                best_match = key
+
+        if best_match is not None and best_score > 65:
+            did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=element, match=best_match)
+
+            debug.warning(did_you_mean)
