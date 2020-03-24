@@ -45,3 +45,19 @@ class PidgenStruct(PidgenElement):
                 # Create a new sub-struct
                 # TODO - What does it mean to have a struct inside a struct?
                 PidgenStruct(self, xml=child)
+
+    def hasValidators(self):
+        """
+        Return True if this struct (or any sub-structs) contain any data validators.
+        """
+
+        # TODO
+        return False
+
+    def hasInitializers(self):
+        """
+        Return True if this struct (or any sub-structs) contain any data initializers.
+        """
+
+        # TODO
+        return False
