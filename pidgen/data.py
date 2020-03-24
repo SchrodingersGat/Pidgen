@@ -16,13 +16,21 @@ class PidgenDataElement(PidgenElement):
     """
 
     ALLOWED_KEYS = [
+        "array",
+        "constant",
+        "checkconstant",
+        "default", "defaultvalue",
+        "dependson", "requires",  # Synonymous
         "datatype", "inmemorytype",  # Synonymous
         "encoding", "encodedtype",  # Synonymous
-        "units",
-        "default",
         "initial", "initvalue", "initialvalue",
-        "minvalue", "verifyminvalue",
         "maxvalue", "verifymaxvalue",
+        "minvalue", "verifyminvalue",
+        "notes",
+        "range",
+        "scaler",
+        "struct",
+        "units",
     ]
 
     REQUIRED_KEYS = [
