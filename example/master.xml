@@ -8,11 +8,11 @@
   <Value name="CRITICAL" value="0x10"/>
 
   <Valpe name='test'/>
-  <Value namre='chicken' value='1234'/>
+  <Value name='chicken' value='1234'/>
 </Enum>
 
-<Packet name='myTestPacket'>
-  <Data name='test' inMemoryType='unsigned8' comment="Test data"/>
+<Packet name='myTestPacket' id='123'>
+  <Data namde='test' inMemoryType='unsigned8' comment="Test data"/>
   <Data name='bloer' inMemoryType='float'/>
 </Packet>
 

@@ -1,6 +1,6 @@
 <Protocol>
 
-<Packet name='telemetry'>
+<Packet name='telemetry' id='PKT_TELEMETRY'>
 
   <Data name='current' datatype='u32' encoding='f16' scaling='10' default='2500' comment='This is a comment' units='0.1A'/>
   <Data name='voltage' encoding='f32'/>
