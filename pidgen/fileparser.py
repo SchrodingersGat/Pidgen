@@ -49,11 +49,6 @@ class PidgenFileParser(PidgenElement):
                 # Construct a struct under this file
                 PidgenStruct(self, xml=child)
 
-        print("File:", self)
-        print("Structs:", self.structs)
-        print("Packets:", self.packets)
-        print("Enums:", self.enumerations)
-
     @property
     def enumerations(self):
         """

@@ -71,31 +71,54 @@ class PidgenElement():
         """ Default implementation does nothing... """
         pass
 
-    def findStructByName(self, struct_name, global_search=True):
+    def findItemByName(self, item_type, item_name, global_search=True):
         """
-        Lookup a struct using the provided name.
+        Lookup an object using the provided name.
 
         Args:
-            struct_name - Name of the struct to look for (case-insensitive)
+            item_type - Can be either a class type or a string which matches a class
+            item_name - Name of the item to look for (case-insensitive)
             global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
         """
 
         if global_search:
+            # Search the entire protocol
             context = self.protocol
         else:
+            # Search just the current object
             context = self
 
         # Grab list of structs
-        structs = context.getChildren("PidgenStruct", traverse_children=global_search)
+        childs = context.getChildren(item_type, traverse_children=global_search)
 
-        for struct in structs:
-            if struct.name.lower() == struct_name.lower():
-                return struct
+        # List of exact matches
+        exact_matches = []
 
-        # TODO - Print "best match" for struct name?
-        # TODO - Warn if duplicate matches are found...
+        best_score = 0
+        best_match = None
+
+        for child in childs:
+            if child.name.lower() == item_name.lower():
+                exact_matches.append(child)
+                best_score = 100
+                best_match = child
+            else:
+                score = fuzz.partial_ratio(child.name.lower(), item_name.lower())
+
+                if score > best_score:
+                    best_score = score
+                    best_match = child
+
+        if len(exact_matches) == 1:
+            return exact_matches[0]
+        elif len(exact_matches) > 1:
+            debug.error("Multiple matches found for '{t}' : '{n}'".format(t=item_type, n=item_name))
+        else:
+            debug.warning("No matches found for '{t}' : '{n}'".format(t=item_type, n=item_name))
+            if best_match is not None and best_score > 65:
+                debug.warning("Instead of '{n}', did you mean '{s}'?".format(n=item_name, s=best_match.name))
+
         return None
-
 
     def getChildren(self, pattern, traverse_children=False):
         """
