@@ -13,7 +13,8 @@ class PidgenPacket(PidgenStruct):
     ]
 
     REQUIRED_KEYS = [
-        "name"
+        "name",
+        "id"
     ]
 
     def __init__(self, parent, **kwargs):

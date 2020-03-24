@@ -31,11 +31,16 @@ def main():
     parser.add_argument("protocol", help="Path to top-level protocol directory")
 
     # Optional arguments
+    parser.add_argument("--no-color", help="Disable colorized debug output", action="store_true")
     parser.add_argument("-v", "--verbose", help="Print verbose output", action="count")
 
     parser.add_argument("--version", action="version", version="Pidgen version: {v}".format(v=PIDGEN_VERSION))
 
     args = parser.parse_args()
+
+    # Prevent color output if specified
+    if args.no_color:
+        debug.setDebugColorOn(False)
 
     # Set the global debugging level
     debug.setDebugLevel(int(args.verbose) if args.verbose is not None else debug.MSG_ERROR)

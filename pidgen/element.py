@@ -26,7 +26,12 @@ class PidgenElement():
     _FALSE = ["n", "no", "0", "false", "off"]
 
     def __repr__(self):
-        return "'{name}' {t} - {f}".format(name=self.name, t=self.__class__, f=self.path)
+        return "<{tag}>:{name} - {f}:{line}".format(
+            tag=self.tag,
+            name=self.name,
+            f=self.path,
+            line=self.lineNumber
+        )
 
     def __init__(self, parent, **kwargs):
         """
@@ -66,6 +71,52 @@ class PidgenElement():
         """ Default implementation does nothing... """
         pass
 
+    def getChildren(self, pattern):
+        """
+        Return any children under this item which conform to the provided pattern.
+        Pattern can be:
+        
+        a) A class type
+        b) A list [] of potential class types
+        """
+
+        # Enforce list format so the following code is consistent
+        if type(pattern) not in [list, tuple]:
+            pattern = [pattern]
+
+        childs = []
+
+        for child in self.children:
+            
+            for p in pattern:
+                if isinstance(child, p):
+                    childs.append(child)
+                    break
+            
+        return childs
+
+    @property
+    def protocol(self):
+        """
+        The "Protocol" object is the top-level directory parser.
+        So, go obtain the "Protocol" object, simply traverse upwards,
+        until there are no higher parent objects.
+        """
+
+        if self.parent is None:
+            return self
+        else:
+            return self.parent.protocol
+
+    @property
+    def lineNumber(self):
+        """ Return the line number of the XML element which defines this object """
+
+        try:
+            return self.xml._start_line_number
+        except AttributeError:
+            return 0
+
     @property
     def tag(self):
         """ Return the base tag associated with this element """
@@ -101,7 +152,7 @@ class PidgenElement():
         Return the value associated with the given key, in the XML data.
 
         Args:
-            key - Name of the key
+            key - Name of the key (or a list of keys to be checked in order)
 
         kwargs:
             ret - Value to return if the key is not found
@@ -111,18 +162,26 @@ class PidgenElement():
         if self.xml is None:
             return ret
 
-        if ignore_case:
-            key = key.lower()
+        # Enforce list encoding
+        if type(key) not in [list, tuple]:
+            key = [key]
 
-            for k in self.keys():
-                if key == k.lower():
-                    return self.xml.get(k, ret)
+        for k in key:
+            if ignore_case:
+                k = k.lower()
 
-            # No matching key found?
-            return ret
+            for sk in self.keys():
+                
+                if ignore_case:
+                    skl = sk.lower()
+                else:
+                    skl = sk
 
-        else:
-            return self.xml.get(key, ret)
+                if k == skl:
+                    return self.xml.get(sk, ret)
+
+        # No matching key found?
+        return ret
 
     @property
     def name(self):
@@ -238,6 +297,10 @@ class PidgenElement():
         if hasattr(self, "ALLOWED_KEYS"):
             for k in self.ALLOWED_KEYS:
                 allowed.add(k)
+
+        # Required keys are also 'allowed'
+        for k in self.required_keys:
+            allowed.add(k)
         
         return allowed
 
@@ -290,7 +353,7 @@ class PidgenElement():
             tag = child.tag.lower()
 
             if tag not in self.allowed_children:
-                self.unknownChild(child.tag)
+                self.unknownChild(child.tag, line=child._start_line_number)
 
     @property
     def level(self):
@@ -398,19 +461,17 @@ class PidgenElement():
         else:
             return False
 
-    def missingKey(self, key, line=0):
+    def missingKey(self, key):
         """
         Display an error about a missing key
         """
 
-        error = "{f} - Missing key '{k}' in <{t}> '{n}'".format(
+        error = "{f}{line} - Missing key '{k}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=self.lineNumber) if self.lineNumber > 0 else "",
             k=key,
             t=self.tag,
             n=self.name)
-
-        if line > 0:
-            error += " (line {n})".format(n=line)
 
         debug.error(error)
 
@@ -419,8 +480,9 @@ class PidgenElement():
         Display a warning about an unknown xml key
         """
 
-        warning = "{f} - Unknown key '{k}' in <{t}> '{n}'".format(
+        warning = "{f}{line} - Unknown key '{k}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=self.lineNumber) if self.lineNumber > 0 else "",
             k=key,
             t=self.tag,
             n=self.name
@@ -447,25 +509,23 @@ class PidgenElement():
                 best_score = score
                 best_match = k
 
-        if best_match is not None and best_score > 65:
+        if best_match is not None and best_score > 60:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=key, match=best_match)
 
-            debug.info(did_you_mean)
+            debug.warning(did_you_mean)
 
     def unknownChild(self, element, line=0):
         """
         Display a warning about an unknown child element.
         """
 
-        warning = "{f} - Unknown child element '{e}' in <{t}> '{n}'".format(
+        warning = "{f}{line} - Unknown child element '{e}' in <{t}> '{n}'".format(
             f=self.path,
+            line=":{n}".format(n=line) if line > 0 else "",
             e=element,
             t=self.tag,
             n=self.name
         )
-
-        if line > 0:
-            warning += " (line {n})".format(n=line)
 
         allowed = self.allowed_children
 
@@ -485,7 +545,7 @@ class PidgenElement():
                 best_score = score
                 best_match = key
 
-        if best_match is not None and best_score > 65:
+        if best_match is not None and best_score > 60:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=element, match=best_match)
 
             debug.warning(did_you_mean)

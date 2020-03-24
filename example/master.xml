@@ -1,23 +1,23 @@
 <Protocol>
 
-<Enum name="StatusCodes" prefix="STATUS_">
+<Enum name="StatusCodes" prefix="STATUS_" suffix="_VALUES">
 
   <Value name='OK' value='1'/>
   <Value name="warning"/>
   <Value name="ERROR"/>
-  <Value name="CRITICAL" value="0x10"/>
+  <Value name="CRITICAL" value="0x10" ignoreSUffix="true"/>
 
-  <Valpe name='test'/>
+  <Value name='test' ignorePrefix="true"/>
   <Value name='chicken' value='1234'/>
 </Enum>
 
-<Packet name='myTestPacket'>
-  <Data name='test' inMemoryType='unsigned8' comment="Test data"/>
-  <Data name='bloer' inMemoryType='float'/>
+<Packet name='myTestPacket' id='123'>
+  <Data namde='test' inMemoryType='unsigned8' comment="Test data"/>
+  <Data name='bloer' inMemoryType='float' initValue='123.0f' minvalue='12.30f'/>
 </Packet>
 
 <Struct name="testStruct">
-  <Data name="a" datatype="float32" comment="Test"/>
+  <Data name="a" datatype="float32" comment="Test" initValue="123.0"/>
 </Struct>
 
 </Protocol>

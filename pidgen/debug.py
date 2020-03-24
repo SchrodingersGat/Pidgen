@@ -25,10 +25,18 @@ MSG_LEVEL = MSG_ERROR
 # Keep track of accumulated errorsh
 ERR_COUNT = 0
 
+# By default, colorized output is ON
+DEBUG_COLOR = True
+
 
 def setDebugLevel(level):
     global MSG_LEVEL
     MSG_LEVEL = int(level)
+
+
+def setDebugColorOn(on=False):
+    global DEBUG_COLOR
+    DEBUG_COLOR = on
 
 
 def getErrorCount():
@@ -41,7 +49,12 @@ def _msg(color, prefix, *arg):
     Display a message with the given color.
     """
 
-    msg = color
+    global DEBUG_COLOR
+
+    if DEBUG_COLOR:
+        msg = color
+    else:
+        msg = ""
     
     if prefix:
         msg += prefix
