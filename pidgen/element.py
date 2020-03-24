@@ -3,23 +3,8 @@
 from __future__ import print_function
 
 import os
-import yaml
 
 from . import debug
-
-
-class PidgenLoader(yaml.loader.SafeLoader):
-    """
-    Custom yaml loader implementation.
-
-    - Includes line number information
-    """
-
-    def construct_mapping(self, node, deep=False):
-        mapping = super(PidgenLoader, self).construct_mapping(node, deep=deep)
-        # Add 1 so line numbering starts at 1
-        mapping['__line__'] = node.start_mark.line + 1
-        return mapping
 
 
 class PidgenElement():
@@ -29,15 +14,11 @@ class PidgenElement():
     
     """
 
-    # Generic keys we can expect for most element types
-    KEY_NAME = "name"
-    KEY_TITLE = "title"
-    KEY_COMMENT = "comment"
-
+    # Keys which are allowed for any element
     _BASIC_KEYS = [
-        KEY_NAME,
-        KEY_TITLE,
-        KEY_COMMENT,
+        "name",
+        "title",
+        "comment",
     ]
 
     # Default implementation of _VALID_KEYS is empty
@@ -49,6 +30,9 @@ class PidgenElement():
     # Options for specifying a "true" value
     _TRUE = ["y", "yes", "1", "true", "on"]
     _FALSE = ["n", "no", "0", "false", "off"]
+
+    def __repr__(self):
+        return "'{name}' <{t}> - {f}".format(name=self.name, t=self.__class__, f=self.path)
 
     def __init__(self, parent, **kwargs):
         """
@@ -287,9 +271,25 @@ class PidgenElement():
         """ Return the 'namespace' (basedir) of this element """
         return os.path.dirname(self.path).strip()
 
+    def parseFloat(self, value):
+        """
+        Check if a value looks like a floating point
+        """
+
+        if type(value) in [int, float]:
+            return value
+
+        value = str(value)
+
+        try:
+            return float(value)
+        except ValueError:
+            debug.warning("Value {i} could not be converted to an float - {f}".format(i=value, f=self.path))
+            raise ValueError
+
     def parseInt(self, value):
         """
-        Check if a value looks like an integer. 
+        Check if a value looks like an integer.
         
         Formats supported:
             integer - 123

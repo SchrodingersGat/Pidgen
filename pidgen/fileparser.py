@@ -9,22 +9,17 @@ from .struct import PidgenStruct
 from .packet import PidgenPacket
 from .enumeration import PidgenEnumeration
 
-from . import debug
-
 
 class PidgenFileParser(PidgenElement):
     """
     Class for representing a single protocol file.
     """
-    
-    KEYS_STRUCT = ["structure", "struct"]
-
-    KEYS_PACKET = ["packet", "pkt"]
-    
-    KEYS_ENUM = ["enumeration", "enum"]
 
     _VALID_KEYS = [
-    ] + KEYS_STRUCT + KEYS_ENUM + KEYS_PACKET
+        "pkt", "packet",  # Synonymous
+        "struct", "structure",  # Synonymous
+        "enum", "enumeration",  # Synonymous
+    ]
 
     def __init__(self, parent, **kwargs):
 
@@ -46,16 +41,17 @@ class PidgenFileParser(PidgenElement):
             # Iterate through each top-level structure in the XML file
             tag = child.tag.lower()
 
-            if tag in self.KEYS_ENUM:
-
+            if tag in ["enum", "enumeration"]:
                 # Construct an Enumeration under this file
-                enum = PidgenEnumeration(self, xml=child)
+                PidgenEnumeration(self, xml=child)
 
-            elif tag in self.KEYS_PACKET:
-                print("Packet:", child)
+            elif tag in ["pkt", "packet"]:
+                # Construct a Packet under this file
+                PidgenPacket(self, xml=child)
 
-            elif tag in self.KEYS_STRUCT:
-                print("Struct:", child)
+            elif tag in ["struct", "structure"]:
+                # Construct a struct under this file
+                PidgenStruct(self, xml=child)
 
             else:
                 self.unknownElement(child.tag)

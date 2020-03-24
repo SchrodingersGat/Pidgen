@@ -9,16 +9,12 @@ class PidgenEnumerationValue(PidgenElement):
     Single element in an enumeration struct
     """
 
-    KEY_VALUE = 'value'
-
     _VALID_KEYS = [
-        PidgenElement.KEY_NAME,
-        PidgenElement.KEY_COMMENT,
-        KEY_VALUE,
+        "value"
     ]
 
     _REQUIRED_KEYS = [
-        PidgenElement.KEY_NAME
+        "name"
     ]
 
     def __init__(self, parent, **kwargs):
@@ -40,17 +36,12 @@ class PidgenEnumeration(PidgenElement):
     The PidgenEnumeration class provides support for integer enumerations.
     """
 
-    # Keys associated with the enumeration
-    KEY_PREFIX = "prefix"
-    
-    # Keys associated with an enumeration value
-    KEY_VALUE = "value"
-
     _VALID_KEYS = [
-        KEY_PREFIX
+        "prefix",
     ]
 
     _REQUIRED_KEYS = [
+        "name",
     ]
 
     def __init__(self, parent, **kwargs):
@@ -66,8 +57,9 @@ class PidgenEnumeration(PidgenElement):
 
         # Look for all the 'value' objects
         for child in self.xml.getchildren():
-            tag = child.tag
-            if tag.lower() == self.KEY_VALUE:
+            tag = child.tag.lower()
+
+            if tag == "value":
 
                 # Create a new enumeration value
                 PidgenEnumerationValue(self, xml=child)
@@ -149,7 +141,7 @@ class PidgenEnumeration(PidgenElement):
     @property
     def prefix(self):
         """ Return the prefix for this enumeration """
-        return self.get(self.KEY_PREFIX, "")
+        return self.get("prefix", "")
 
     def renderKey(self, key, capitalize=True):
         """ Render a key for this enumeration """

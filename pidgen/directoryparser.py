@@ -6,7 +6,6 @@ Directory parsing
 """
 
 import os
-import sys
 from .element import PidgenElement
 from .fileparser import PidgenFileParser
 from . import debug
@@ -24,9 +23,6 @@ class PidgenDirectoryParser(PidgenElement):
         kwargs["path"] = dirpath
 
         PidgenElement.__init__(self, parent, **kwargs)
-
-        self._files = []
-        self._dirs = []
 
         self.parse()
 
@@ -81,11 +77,9 @@ class PidgenDirectoryParser(PidgenElement):
             debug.info("Reading file: {f}".format(f=f))
 
             if root.tag.lower() == 'protocol':
-                self._files.append(PidgenFileParser(
-                    self,
-                    xml=root,
-                    path=f
-                ))
+
+                # Create a new file parser instance
+                PidgenFileParser(self, xml=root, path=f)
             else:
                 debug.warning("File {f} has root tag '{t}' - skipping.".format(
                     f=f,
@@ -95,4 +89,15 @@ class PidgenDirectoryParser(PidgenElement):
     def parseSubDirs(self, dirs):
         for d in dirs:
 
-            self._dirs.append(PidgenDirectoryParser(self, os.path.join(self.path, d)))
+            # Create a new DirectoryParser instance
+            PidgenDirectoryParser(self, os.path.join(self.path, d))
+
+    @property
+    def files(self):
+        """ Return a list of protocol files under this directory """
+        return [c for c in self.children if isinstance(c, PidgenFileParser)]
+
+    @property
+    def dirs(self):
+        """ Return a list of directories under this directory """
+        return [c for c in self.children if isinstance(c, PidgenDirectoryParser)]

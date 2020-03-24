@@ -4,7 +4,7 @@ from .element import PidgenElement
 from . import debug
 
 
-class PidgenData(PidgenElement):
+class PidgenDataElement(PidgenElement):
     """
     A PidgenData object is a basic data entry,
     which can be defined in either a struct or a packet
@@ -15,16 +15,11 @@ class PidgenData(PidgenElement):
         units - Natural units of the represented data
     """
 
-    KEY_STRUCT = "struct"
-    KEY_DATATYPE = "datatype"
-    KEY_ENCODING = "encoding"
-    KEY_UNITS = "units"
-
     _VALID_KEYS = [
-        KEY_STRUCT,
-        KEY_DATATYPE,
-        KEY_ENCODING,
-        KEY_UNITS
+        "datatype", "inMemoryType",  # Synonymous
+        "encoding", "encodedType",  # Synonymous
+        "units",
+        "default",
     ]
 
     # Allowable datatypes
@@ -80,10 +75,10 @@ class PidgenData(PidgenElement):
 
         PidgenElement.__init__(self, parent, **kwargs)
 
-        self.parse()
-
     def parse(self):
-        debug.debug("Parsing data entry:", self.name, self.datatype)
+        # TODO
+
+        pass
 
     @property
     def datatype(self):
@@ -93,15 +88,18 @@ class PidgenData(PidgenElement):
         If no 'datatype' is specified, look for an 'encoding' specification.
         """
 
-        dt = ""
+        dt = None
 
-        if self.KEY_DATATYPE in self.data:
-            dt = self.data[self.KEY_DATATYPE]
-        elif self.KEY_ENCODING in self.data:
-            dt = self.data[self.KEY_ENCODING]
-        else:
-            debug.error("No '{key}' set for entry '{name}' - {f}".format(
-                key=self.KEY_DATATYPE,
+        options = ['datatype', 'inMemoryType', 'encoding', 'encodedType']
+
+        for opt in options:
+            dt = self.get(opt)
+
+            if dt:
+                break
+
+        if dt is None:
+            debug.error("No data-type set for entry '{name}' - {f}".format(
                 name=self.name,
                 f=self.path
             ))
@@ -135,17 +133,23 @@ class PidgenData(PidgenElement):
         then the 'datatype' tag is used by default.
         """
 
-        if self.KEY_ENCODING in self.data:
-            enc = self.data[self.KEY_ENCODING]
-        elif self.KEY_DATATYPE in self.data:
-            enc = self.data[self.KEY_DATATYPE]
-        else:
-            debug.error("No '{key}' provided for entry '{name}' - {f}".format(
-                key=self.KEY_ENCODING,
+        options = ['encoding', 'encodedType']
+
+        enc = None
+
+        for opt in options:
+            enc = self.get(opt)
+
+        # Default to the internal datatype
+        if enc is None:
+            enc = self.datatype
+
+        if enc is None:
+            debug.error("No encoding provided for entry '{name}' - {f}".format(
                 name=self.name,
                 f=self.path
             ))
-            
+
             return None
 
         enc = enc.lower()
@@ -169,4 +173,4 @@ class PidgenData(PidgenElement):
     @property
     def units(self):
         """ Return the units of this data element """
-        return self.data.get(self.KEY_UNITS, "")
+        return self.get("units")

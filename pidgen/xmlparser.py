@@ -12,6 +12,7 @@ Ref: https://stackoverflow.com/questions/6949395/is-there-a-way-to-get-a-line-nu
 import xml.etree.ElementTree as ElementTree
 from . import debug
 
+
 def parseXML(filename):
     try:
         return ElementTree.parse(filename)

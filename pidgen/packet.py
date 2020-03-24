@@ -9,11 +9,12 @@ class PidgenPacket(PidgenStruct):
     A Packet is a sub-set of a struct.
     """
 
+    _VALID_KEYS = PidgenStruct._VALID_KEYS + [
+    ]
+
     def __init__(self, parent, **kwargs):
 
         PidgenStruct.__init__(self, parent, **kwargs)
-
-        self.parse_packet()
 
     def parse_packet(self):
         """
