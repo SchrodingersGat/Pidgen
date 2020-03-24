@@ -8,4 +8,8 @@
 
 </Packet>
 
+<Struct name="MyStruct">
+  <Data name="hello" datatype="i8"/>
+</Struct>
+
 </Protocol>

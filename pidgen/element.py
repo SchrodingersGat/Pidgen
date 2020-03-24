@@ -71,13 +71,40 @@ class PidgenElement():
         """ Default implementation does nothing... """
         pass
 
-    def getChildren(self, pattern):
+    def findStructByName(self, struct_name, global_search=True):
+        """
+        Lookup a struct using the provided name.
+
+        Args:
+            struct_name - Name of the struct to look for (case-insensitive)
+            global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
+        """
+
+        if global_search:
+            context = self.protocol
+        else:
+            context = self
+
+        # Grab list of structs
+        structs = context.getChildren("PidgenStruct", traverse_children=global_search)
+
+        for struct in structs:
+            if struct.name.lower() == struct_name.lower():
+                return struct
+
+        # TODO - Print "best match" for struct name?
+        # TODO - Warn if duplicate matches are found...
+        return None
+
+
+    def getChildren(self, pattern, traverse_children=False):
         """
         Return any children under this item which conform to the provided pattern.
         Pattern can be:
         
         a) A class type
-        b) A list [] of potential class types
+        b) A "string" representation of a class type (to get around circular import issues)
+        c) A list [] of potential class types as per a) or b)
         """
 
         # Enforce list format so the following code is consistent
@@ -89,10 +116,17 @@ class PidgenElement():
         for child in self.children:
             
             for p in pattern:
-                if isinstance(child, p):
+                if type(p) is str:
+                    if p.lower() in str(child.__class__).lower():
+                        childs.append(child)
+                        break
+                elif isinstance(child, p):
                     childs.append(child)
                     break
-            
+
+            if traverse_children:
+                childs += child.getChildren(pattern, True)
+
         return childs
 
     @property
