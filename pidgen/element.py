@@ -71,13 +71,68 @@ class PidgenElement():
         """ Default implementation does nothing... """
         pass
 
-    def getChildren(self, pattern):
+    def findItemByName(self, item_type, item_name, global_search=True):
+        """
+        Lookup an object using the provided name.
+
+        Args:
+            item_type - Can be either a class type or a string which matches a class
+            item_name - Name of the item to look for (case-insensitive)
+            global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
+
+        Return:
+            Matching item, if one (and only one) match was found.
+            - If no matches are found, issue a warning and return None
+            - If multiple matches are found, issue an error and return None
+        """
+
+        if global_search:
+            # Search the entire protocol
+            context = self.protocol
+        else:
+            # Search just the current object
+            context = self
+
+        # Grab list of structs
+        childs = context.getChildren(item_type, traverse_children=global_search)
+
+        # List of exact matches
+        exact_matches = []
+
+        best_score = 0
+        best_match = None
+
+        for child in childs:
+            if child.name.lower() == item_name.lower():
+                exact_matches.append(child)
+                best_score = 100
+                best_match = child
+            else:
+                score = fuzz.partial_ratio(child.name.lower(), item_name.lower())
+
+                if score > best_score:
+                    best_score = score
+                    best_match = child
+
+        if len(exact_matches) == 1:
+            return exact_matches[0]
+        elif len(exact_matches) > 1:
+            debug.error("Multiple matches found for '{t}' : '{n}'".format(t=item_type, n=item_name))
+        else:
+            debug.warning("No matches found for '{t}' : '{n}'".format(t=item_type, n=item_name))
+            if best_match is not None and best_score > 65:
+                debug.warning("Instead of '{n}', did you mean '{s}'?".format(n=item_name, s=best_match.name))
+
+        return None
+
+    def getChildren(self, pattern, traverse_children=False):
         """
         Return any children under this item which conform to the provided pattern.
         Pattern can be:
         
         a) A class type
-        b) A list [] of potential class types
+        b) A "string" representation of a class type (to get around circular import issues)
+        c) A list [] of potential class types as per a) or b)
         """
 
         # Enforce list format so the following code is consistent
@@ -89,10 +144,17 @@ class PidgenElement():
         for child in self.children:
             
             for p in pattern:
-                if isinstance(child, p):
+                if type(p) is str:
+                    if p.lower() in str(child.__class__).lower():
+                        childs.append(child)
+                        break
+                elif isinstance(child, p):
                     childs.append(child)
                     break
-            
+
+            if traverse_children:
+                childs += child.getChildren(pattern, True)
+
         return childs
 
     @property

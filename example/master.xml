@@ -20,4 +20,8 @@
   <Data name="a" datatype="float32" comment="Test" initValue="123.0"/>
 </Struct>
 
+<Struct name='TestStruct'>
+
+</Struct>
+
 </Protocol>

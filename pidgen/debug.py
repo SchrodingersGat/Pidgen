@@ -7,12 +7,14 @@ from colorama import Fore
 
 # Various msg levels
 MSG_MESSAGE = -1   # Display generic message (always displayed)
-MSG_ERROR = 0      # Display error messages
-MSG_WARN = 1       # Display warning messages
-MSG_INFO = 2       # Display information messages
-MSG_DEBUG = 3      # Display debug messages
+MSG_CRITICAL = 0   # Display a critical error (and exit)
+MSG_ERROR = 1      # Display error messages
+MSG_WARN = 2       # Display warning messages
+MSG_INFO = 3       # Display information messages
+MSG_DEBUG = 4      # Display debug messages
 
 MSG_CODES = {
+    MSG_CRITICAL: "CRITICAL",
     MSG_ERROR: "ERROR",
     MSG_WARN: "WARNING",
     MSG_INFO: "INFO",
@@ -117,11 +119,16 @@ def error(*arg, **kwargs):
     if MSG_LEVEL < MSG_ERROR:
         return
 
-    _msg(Fore.RED, MSG_CODES[MSG_ERROR], *arg)
+    fail = kwargs.get('fail', False)
+
+    if fail:
+        code = MSG_CODES[MSG_CRITICAL]
+    else:
+        code = MSG_CODES[MSG_ERROR]
+
+    _msg(Fore.RED, code, *arg)
 
     ERR_COUNT += 1
-
-    fail = kwargs.get('fail', False)
 
     if fail:
         sys.exit(ERR_COUNT)
