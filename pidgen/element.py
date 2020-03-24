@@ -26,7 +26,7 @@ class PidgenElement():
     _FALSE = ["n", "no", "0", "false", "off"]
 
     def __repr__(self):
-        return "'{name}' {t} - {f}".format(name=self.name, t=self.__class__, f=self.path)
+        return "<{tag}>:{name} {t} - {f}".format(tag=self.tag, name=self.name, t=self.__class__, f=self.path)
 
     def __init__(self, parent, **kwargs):
         """
@@ -447,10 +447,10 @@ class PidgenElement():
                 best_score = score
                 best_match = k
 
-        if best_match is not None and best_score > 65:
+        if best_match is not None and best_score > 60:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=key, match=best_match)
 
-            debug.info(did_you_mean)
+            debug.warning(did_you_mean)
 
     def unknownChild(self, element, line=0):
         """
@@ -485,7 +485,7 @@ class PidgenElement():
                 best_score = score
                 best_match = key
 
-        if best_match is not None and best_score > 65:
+        if best_match is not None and best_score > 60:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=element, match=best_match)
 
             debug.warning(did_you_mean)
