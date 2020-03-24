@@ -152,7 +152,7 @@ class PidgenElement():
         Return the value associated with the given key, in the XML data.
 
         Args:
-            key - Name of the key
+            key - Name of the key (or a list of keys to be checked in order)
 
         kwargs:
             ret - Value to return if the key is not found
@@ -162,18 +162,26 @@ class PidgenElement():
         if self.xml is None:
             return ret
 
-        if ignore_case:
-            key = key.lower()
+        # Enforce list encoding
+        if type(key) not in [list, tuple]:
+            key = [key]
 
-            for k in self.keys():
-                if key == k.lower():
-                    return self.xml.get(k, ret)
+        for k in key:
+            if ignore_case:
+                k = k.lower()
 
-            # No matching key found?
-            return ret
+            for sk in self.keys():
+                
+                if ignore_case:
+                    skl = sk.lower()
+                else:
+                    skl = sk
 
-        else:
-            return self.xml.get(key, ret)
+                if k == skl:
+                    return self.xml.get(sk, ret)
+
+        # No matching key found?
+        return ret
 
     @property
     def name(self):

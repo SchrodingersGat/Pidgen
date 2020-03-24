@@ -13,11 +13,11 @@
 
 <Packet name='myTestPacket' id='123'>
   <Data namde='test' inMemoryType='unsigned8' comment="Test data"/>
-  <Data name='bloer' inMemoryType='float'/>
+  <Data name='bloer' inMemoryType='float' initValue='123.0f' minvalue='12.30f'/>
 </Packet>
 
 <Struct name="testStruct">
-  <Data name="a" datatype="float32" comment="Test"/>
+  <Data name="a" datatype="float32" comment="Test" initValue="123.0"/>
 </Struct>
 
 </Protocol>

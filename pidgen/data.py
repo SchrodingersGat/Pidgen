@@ -20,6 +20,9 @@ class PidgenDataElement(PidgenElement):
         "encoding", "encodedtype",  # Synonymous
         "units",
         "default",
+        "initial", "initvalue", "initialvalue",
+        "minvalue", "verifyminvalue",
+        "maxvalue", "verifymaxvalue",
     ]
 
     REQUIRED_KEYS = [
@@ -178,3 +181,38 @@ class PidgenDataElement(PidgenElement):
     def units(self):
         """ Return the units of this data element """
         return self.get("units")
+
+    @property
+    def minValue(self):
+        """ Return the 'minimum value' for this data element. """
+
+        return self.get(['minvalue', 'verifyminvalue'], None)
+
+    @property
+    def maxValue(self):
+        """ Return the 'maximum value' for this data element. """
+
+        return self.get(['maxvalue', 'verifymaxvalue'], None)
+
+    @property
+    def initialValue(self):
+        """
+        Return the 'initial' value for this data element.
+        The 'initial' value is the value
+        """
+
+        return self.get(['initial', 'initValue', 'initialValue'], None)
+
+    def hasValidators(self):
+        """
+        Return True if this data object has any validators.
+        """
+
+        return self.minValue is not None or self.maxValue is not None
+
+    def hasInitializers(self):
+        """
+        Return True if this data object has any initializers.
+        """
+
+        return self.initialValue is not None
