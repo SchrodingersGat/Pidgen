@@ -9,7 +9,10 @@ from . import debug
 
 import sys
 
+# It is required that this sys.modules value be set *before* importing ElementTree
+# Because, reasons?
 sys.modules['_elementtree'] = None
+
 import xml.etree.ElementTree as ElementTree  # noqa: E402
 
 
