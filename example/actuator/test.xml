@@ -1,0 +1,11 @@
+<Protocol>
+
+<Packet name='telemetry'>
+
+  <Data name='current' datatype='u32' encoding='f16' scaling='10' default='2500' comment='This is a comment' units='0.1A'/>
+  <Data name='voltage' encoding='f32'/>
+  <Data name='temperature' encoding='i16'/>
+
+</Packet>
+
+</Protocol>
