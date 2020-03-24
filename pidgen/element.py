@@ -441,13 +441,13 @@ class PidgenElement():
         best_score = 0
 
         for k in allowed:
-            score = fuzz.partial_ratio(key, k)
+            score = fuzz.partial_ratio(key.lower(), k)
 
             if score > best_score:
                 best_score = score
                 best_match = k
 
-        if best_match is not None and best_score > 50:
+        if best_match is not None and best_score > 65:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=key, match=best_match)
 
             debug.info(did_you_mean)
@@ -479,13 +479,13 @@ class PidgenElement():
         best_score = 0
 
         for key in allowed:
-            score = fuzz.partial_ratio(element, key)
+            score = fuzz.partial_ratio(element.lower(), key)
 
             if score > best_score:
                 best_score = score
                 best_match = key
 
-        if best_match is not None and best_score > 50:
+        if best_match is not None and best_score > 65:
             did_you_mean = "Instead of '{k}', did you mean '{match}'?".format(k=element, match=best_match)
 
             debug.warning(did_you_mean)
