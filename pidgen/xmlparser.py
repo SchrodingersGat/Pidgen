@@ -10,7 +10,8 @@ from . import debug
 import sys
 
 sys.modules['_elementtree'] = None
-import xml.etree.ElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree  # noqa: E402
+
 
 class LineNumberingParser(ElementTree.XMLParser):
     """
@@ -40,6 +41,5 @@ class LineNumberingParser(ElementTree.XMLParser):
 def parseXML(filename):
     try:
         return ElementTree.parse(filename, parser=LineNumberingParser())
-        #return ElementTree.parse(filename)
     except ElementTree.ParseError as e:
         debug.error("Error parsing XML file - '{f}' : {e}".format(f=filename, e=e), fail=True)
