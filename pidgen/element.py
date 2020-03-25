@@ -98,14 +98,17 @@ class PidgenElement():
                 f=abspath))
             return False
 
-    def findItemByName(self, item_type, item_name, global_search=True):
+    def findItemByName(self, item_type, item_name, global_search=True, ignore_case=True):
         """
         Lookup an object using the provided name.
 
         Args:
             item_type - Can be either a class type or a string which matches a class
             item_name - Name of the item to look for (case-insensitive)
+
+        kwargs:
             global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
+            ignore_case - If true, use case-insenstive matching (default=True)
 
         Return:
             Matching item, if one (and only one) match was found.
@@ -129,8 +132,17 @@ class PidgenElement():
         best_score = 0
         best_match = None
 
+        if ignore_case:
+            item_name = item_name.lower()
+
         for child in childs:
-            if child.name.lower() == item_name.lower():
+
+            child_name = child.name
+
+            if ignore_case:
+                child_name = child_name.lower()
+
+            if child_name == item_name:
                 exact_matches.append(child)
                 best_score = 100
                 best_match = child
