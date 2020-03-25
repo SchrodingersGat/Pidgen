@@ -26,7 +26,6 @@ class PidgenDirectoryParser(PidgenElement):
 
         PidgenElement.__init__(self, parent, **kwargs)
 
-
     def parse(self):
         """ Parse the current directory.
         - Look for any subdirectories
@@ -98,7 +97,6 @@ class PidgenDirectoryParser(PidgenElement):
     def dirs(self):
         """ Return a list of directories under this directory """
         return self.getChildren(PidgenDirectoryParser)
-
 
 
 class PidgenFileParser(PidgenElement):
@@ -205,4 +203,3 @@ class PidgenFileParser(PidgenElement):
                     f=filename,
                     t=root.tag
                 ))
-

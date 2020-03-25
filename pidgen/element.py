@@ -5,7 +5,6 @@ from __future__ import print_function
 import os
 from rapidfuzz import fuzz
 
-from .xmlparser import parseXML
 from . import debug
 
 
@@ -97,7 +96,7 @@ class PidgenElement():
             debug.error("{path} - Path '{f}' is invalid".format(
                 path=self.path,
                 f=abspath))
-            return False        
+            return False
 
     def findItemByName(self, item_type, item_name, global_search=True):
         """

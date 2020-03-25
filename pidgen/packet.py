@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from .struct import PidgenStruct
-from . import debug
 
 
 class PidgenPacket(PidgenStruct):

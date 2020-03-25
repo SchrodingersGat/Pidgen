@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 
-from .element import PidgenElement
-from .fileparser import PidgenDirectoryParser, PidgenFileParser
+from .fileparser import PidgenFileParser
 from .xmlparser import parseXML
 from . import debug
 
@@ -58,7 +56,8 @@ class PidgenProtocolParser(PidgenFileParser):
         # Add the curent file
         self.checkPath(protocol_file)
 
-        PidgenElement.__init__(self, self, **kwargs)
+        # The call to '__init__' here will call parse(), which then parses the file
+        PidgenFileParser.__init__(self, self, **kwargs)
 
     @property
     def version(self):
