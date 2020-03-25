@@ -2,7 +2,6 @@
 
 from . import element
 from . import debug
-from . import directoryparser
 from . import fileparser
 from . import enumeration
 from . import struct

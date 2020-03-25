@@ -26,6 +26,4 @@ class PidgenPacket(PidgenStruct):
         Parse a packet object
         """
 
-        debug.debug("Parsing packet:", self.name)
-
         # Note - the underlying struct data has already been parsed here

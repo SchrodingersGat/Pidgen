@@ -1,0 +1,14 @@
+<Protocol name="test" version="1.0.0f">
+
+<Enumeration name='hello'>
+    <Value name='cat'/>
+
+</Enumeration>
+
+<Require file='master.xml'/>
+<Require file='actuator/test.xml'/>
+
+<Require dir='actuator'/>
+<Require dir='system'/>
+
+</Protocol>
