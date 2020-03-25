@@ -26,11 +26,11 @@ class PidgenElement():
     _FALSE = ["n", "no", "0", "false", "off"]
 
     def __repr__(self):
-        return "<{tag}>:{name} - {f}:{line}".format(
+        return "{f}:{line} - <{tag}>:{name}".format(
+            f=self.path,
+            line=self.lineNumber,
             tag=self.tag,
             name=self.name,
-            f=self.path,
-            line=self.lineNumber
         )
 
     def __init__(self, parent, **kwargs):
@@ -45,7 +45,8 @@ class PidgenElement():
             path - Filepath of this object
         """
 
-        self.xml = kwargs.get("xml", None)
+        if not hasattr(self, 'xml'):
+            self.xml = kwargs.get("xml", None)
 
         self.children = []
 
@@ -65,20 +66,49 @@ class PidgenElement():
     def _parse(self):
         if self.xml is not None:
             debug.debug("Parsing", str(self))
-            self.parse()
+            
+        self.parse()
 
     def parse(self):
         """ Default implementation does nothing... """
         pass
 
-    def findItemByName(self, item_type, item_name, global_search=True):
+    def checkPath(self, path):
+        """
+        Check if the given path has already been parsed by the protocol.
+        
+        Args:
+            path - Path of the file or directory to check
+        """
+
+        abspath = os.path.abspath(path)
+
+        if abspath in self.protocol.files:
+            debug.warning("{path} - Path '{f}' has already been parsed".format(
+                path=self.path,
+                f=path))
+            
+        elif os.path.exists(abspath):
+            self.protocol.files.append(abspath)
+            return True
+    
+        else:
+            debug.error("{path} - Path '{f}' is invalid".format(
+                path=self.path,
+                f=abspath))
+            return False
+
+    def findItemByName(self, item_type, item_name, global_search=True, ignore_case=True):
         """
         Lookup an object using the provided name.
 
         Args:
             item_type - Can be either a class type or a string which matches a class
             item_name - Name of the item to look for (case-insensitive)
+
+        kwargs:
             global_search - If True, search the entire protocol. Otherwise, search local object. (Default = True)
+            ignore_case - If true, use case-insenstive matching (default=True)
 
         Return:
             Matching item, if one (and only one) match was found.
@@ -102,8 +132,17 @@ class PidgenElement():
         best_score = 0
         best_match = None
 
+        if ignore_case:
+            item_name = item_name.lower()
+
         for child in childs:
-            if child.name.lower() == item_name.lower():
+
+            child_name = child.name
+
+            if ignore_case:
+                child_name = child_name.lower()
+
+            if child_name == item_name:
                 exact_matches.append(child)
                 best_score = 100
                 best_match = child
@@ -165,10 +204,10 @@ class PidgenElement():
         until there are no higher parent objects.
         """
 
-        if self.parent is None:
+        if not hasattr(self, 'parent') or self.parent is None:
             return self
         else:
-            return self.parent.protocol
+            return self.parent
 
     @property
     def lineNumber(self):
@@ -221,7 +260,7 @@ class PidgenElement():
             ignore_case - If true, key-lookup is not case sensitive (default = True)
         """
 
-        if self.xml is None:
+        if not hasattr(self, 'xml') or self.xml is None:
             return ret
 
         # Enforce list encoding
@@ -272,6 +311,14 @@ class PidgenElement():
             return self.parent.path
         else:
             return p
+
+    @property
+    def directory(self):
+        """
+        Return the directory for the current object
+        """
+
+        return os.path.dirname(self.path)
 
     @property
     def comment(self):

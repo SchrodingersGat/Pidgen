@@ -12,7 +12,7 @@
 </Enum>
 
 <Packet name='myTestPacket' id='123'>
-  <Data namde='test' inMemoryType='unsigned8' comment="Test data"/>
+  <Data name='test' inMemoryType='unsigned8' comment="Test data"/>
   <Data name='bloer' inMemoryType='float' initValue='123.0f' minvalue='12.30f'/>
 </Packet>
 
